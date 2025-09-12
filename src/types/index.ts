@@ -10,6 +10,20 @@ export interface LoginProps {
 export interface HeaderProps {
   user: User;
   onSignOut: () => void;
+  isSidebarOpen: boolean;
+  isSidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
+  onToggleCollapse: () => void;
+}
+
+export interface SidebarProps {
+  isOpen: boolean;
+  isCollapsed: boolean;
+  onClose: () => void;
+}
+
+export interface ContentProps {
+  isSidebarCollapsed?: boolean;
 }
 
 export interface SidebarItem {
