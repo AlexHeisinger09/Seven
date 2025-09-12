@@ -1,5 +1,6 @@
 // src/seven/MiFicha/MiFicha.tsx
 import { useState } from 'react';
+import { Avatar } from '../../components/Avatar';
 
 interface MiFichaProps {
   isSidebarCollapsed?: boolean;
@@ -169,9 +170,11 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
         <div className="bg-white shadow-sm border-b border-gray-200 p-6 mb-6">
           {/* Información principal con foto y nombre */}
           <div className="flex items-start gap-4 mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
-              <span className="text-white text-2xl font-bold">AH</span>
-            </div>
+            <Avatar 
+              name="Alex Heisinger Vivanco"
+              size="xl"
+              className="shadow-lg flex-shrink-0"
+            />
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-blue-600 text-sm font-medium">¡Hola!</span>

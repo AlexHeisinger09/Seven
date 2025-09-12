@@ -1,5 +1,7 @@
+// src/components/Header.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import type { HeaderProps } from '../types';
+import { Avatar } from './Avatar';
 
 interface ExtendedHeaderProps extends HeaderProps {
   isSidebarOpen: boolean;
@@ -140,11 +142,11 @@ export function Header({
             className="flex items-center gap-3 ml-3 p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
             onClick={handleProfileClick}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
-              <span className="text-white text-sm font-semibold">
-                {user.email.charAt(0).toUpperCase()}
-              </span>
-            </div>
+            <Avatar 
+              name="Alex Heisinger"
+              size="md"
+              className="shadow-sm"
+            />
             <div className="hidden sm:block">
               <div className="text-sm font-semibold text-gray-900">
                 Alex Heisinger

@@ -1,4 +1,6 @@
 // src/seven/Portal/Portal.tsx
+import { Avatar } from '../../components/Avatar';
+
 interface PortalProps {
   isSidebarCollapsed?: boolean;
 }
@@ -13,6 +15,7 @@ interface Post {
   time: string;
   image?: string;
   profileImage?: string;
+  personName?: string;
   likes?: number;
   comments?: number;
   icon?: React.ReactNode;
@@ -28,7 +31,7 @@ export function Portal({ isSidebarCollapsed = false }: PortalProps) {
       author: 'Muelles de Penco',
       date: '10 de septiembre',
       time: '11:30 AM',
-      image: '/api/placeholder/800/400',
+      image: 'https://media.licdn.com/dms/image/v2/D4E22AQHtOsNvsGgafQ/feedshare-shrink_1280/B4EZSEKHo1HgAw-/0/1737384034529?e=1760572800&v=beta&t=iy2MLpmhLTvbz80gEcQP2jAbYo6nx7SFP4RQnEqoqWI',
       icon: (
         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
           <img src="/logo.png" alt="Logo" className="w-8 h-8" />
@@ -43,7 +46,7 @@ export function Portal({ isSidebarCollapsed = false }: PortalProps) {
       author: 'Muelles de Penco',
       date: '27 de agosto',
       time: '08:00 AM',
-      profileImage: '/api/placeholder/120/120',
+      personName: 'Rodrigo Andrés Flores',
       likes: 3,
       icon: (
         <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-red-500 rounded-full flex items-center justify-center">
@@ -59,7 +62,8 @@ export function Portal({ isSidebarCollapsed = false }: PortalProps) {
       author: 'Muelles de Penco',
       date: '15 de julio',
       time: '04:30 PM',
-      image: '/api/placeholder/800/600',
+      image: 'https://bukwebapp-enterprise-chile.s3.amazonaws.com/muellesdepenco/employee_portal/mural_photo/url/1919/b07e6732-b786-447a-bd4a-04144a1388a7-Ingresos_para_BUK.png',
+      personName: 'Jonathan Campos Toloza',
       icon: (
         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
           <img src="/logo.png" alt="Logo" className="w-8 h-8" />
@@ -112,18 +116,19 @@ export function Portal({ isSidebarCollapsed = false }: PortalProps) {
           </div>
         )}
 
-        {/* Perfil especial para cumpleaños */}
-        {post.type === 'celebration' && post.profileImage && (
+        {/* Perfil especial para cumpleaños y bienvenidas */}
+        {(post.type === 'celebration' || post.type === 'welcome') && post.personName && (
           <div className="p-6">
             <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border-4 border-blue-100">
-                <img
-                  src={post.profileImage}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h4 className="font-semibold text-gray-900">Rodrigo Andrés Flores</h4>
+              <Avatar 
+                name={post.personName}
+                size="lg"
+                className="mb-3 border-4 border-blue-100 shadow-lg"
+              />
+              <h4 className="font-semibold text-gray-900">{post.personName}</h4>
+              {post.type === 'welcome' && (
+                <p className="text-sm text-gray-600 mt-1">Nuevo integrante</p>
+              )}
             </div>
           </div>
         )}

@@ -75,7 +75,7 @@ export function Login({ onSuccess }: LoginProps) {
                   <input
                     type="email"
                     className="flex-1 py-4 px-4 text-gray-900 bg-transparent outline-none placeholder-gray-500"
-                    placeholder="tu@empresa.com"
+                    placeholder="tu@correo.com"
                     value={state.email}
                     onChange={(e) => updateState({ email: e.target.value })}
                     aria-invalid={!!state.error}
