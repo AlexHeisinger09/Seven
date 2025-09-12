@@ -46,31 +46,27 @@ export function Header({
     onSignOut();
   };
 
+  const handleToggleClick = () => {
+    // En desktop usa onToggleCollapse para colapsar/expandir
+    // En móvil no hace nada porque el menú está en la parte inferior
+    if (window.innerWidth >= 1024) {
+      onToggleCollapse();
+    }
+  };
+
   return (
     <header className="h-20 flex items-center bg-white border-b border-gray-200 px-4 lg:px-6 shadow-sm">
-      {/* Botón hamburguesa/colapsar - un solo botón con íconos diferentes */}
+      {/* Botón hamburguesa - solo visible en desktop para colapsar */}
       <div className="flex items-center">
         <button
-          onClick={() => {
-            // En móvil usa onToggleSidebar, en desktop usa onToggleCollapse
-            if (window.innerWidth < 1024) {
-              onToggleSidebar();
-            } else {
-              onToggleCollapse();
-            }
-          }}
-          className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
-          aria-label="Toggle menu"
+          onClick={handleToggleClick}
+          className="hidden lg:flex p-3 rounded-lg hover:bg-gray-100 transition-colors"
+          aria-label="Toggle sidebar"
         >
-          {/* Ícono hamburguesa para móvil */}
-          <svg className="lg:hidden w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          
-          {/* Ícono colapsar para desktop */}
+          {/* Solo ícono hamburguesa */}
           <svg 
-            className={`hidden lg:block w-6 h-6 text-gray-600 transition-transform duration-200 ${
-              isSidebarCollapsed ? 'rotate-180' : ''
+            className={`w-6 h-6 text-gray-600 transition-transform duration-200 ${
+              isSidebarCollapsed ? 'rotate-0' : 'rotate-0'
             }`} 
             fill="none" 
             stroke="currentColor" 
@@ -80,10 +76,19 @@ export function Header({
               strokeLinecap="round" 
               strokeLinejoin="round" 
               strokeWidth={2} 
-              d="M11 19l-7-7 7-7m8 14l-7-7 7-7" 
+              d="M4 6h16M4 12h16M4 18h16" 
             />
           </svg>
         </button>
+      </div>
+
+      {/* Logo visible en móvil cuando no hay botón hamburguesa */}
+      <div className="lg:hidden flex items-center">
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className="w-18 h-18"
+        />
       </div>
 
       {/* Barra de búsqueda */}
@@ -107,6 +112,13 @@ export function Header({
 
       {/* Acciones del usuario */}
       <div className="flex items-center gap-2 ml-auto">
+        {/* Botón de búsqueda en móvil */}
+        <button className="md:hidden p-3 rounded-xl hover:bg-gray-100 transition-colors">
+          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+
         {/* Botón de notificaciones */}
         <button className="p-3 rounded-xl hover:bg-gray-100 transition-colors relative">
           <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,7 +128,7 @@ export function Header({
         </button>
 
         {/* Botón de ayuda */}
-        <button className="p-3 rounded-xl hover:bg-gray-100 transition-colors">
+        <button className="hidden sm:flex p-3 rounded-xl hover:bg-gray-100 transition-colors">
           <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -156,11 +168,6 @@ export function Header({
           {/* Dropdown Menu */}
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-              {/* Información del usuario en el dropdown */}
-              <div className="px-4 py-3 border-b border-gray-100">
-                <div className="text-sm font-medium text-gray-900">Alex Heisinger</div>
-                <div className="text-sm text-gray-500">{user.email}</div>
-              </div>
 
               {/* Opción Configuración */}
               <button

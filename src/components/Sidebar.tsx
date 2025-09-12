@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { COLORS } from '../utils/constants';
 
 interface SidebarProps {
@@ -8,6 +8,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
+  // Estado local para el modal de "Más opciones" en móvil
+  const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+
   const menuItems = [
     { 
       label: 'Portal', 
@@ -50,19 +53,67 @@ export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       )
+    },
+    { 
+      label: 'Configuración', 
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    { 
+      label: 'Centro de Ayuda', 
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    { 
+      label: 'Notificaciones', 
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+        </svg>
+      )
     }
   ];
 
+  // Primeros 4 items para la barra inferior en móvil
   const mainMenuItems = menuItems.slice(0, 4);
+  // Items adicionales para el modal "Más"
   const additionalItems = menuItems.slice(4);
+
+  const handleMoreClick = () => {
+    setIsMoreModalOpen(!isMoreModalOpen);
+  };
+
+  const handleMoreModalClose = () => {
+    setIsMoreModalOpen(false);
+  };
+
+  const handleMenuItemClick = () => {
+    // Cerrar ambos modals cuando se selecciona un item
+    setIsMoreModalOpen(false);
+    onClose();
+  };
 
   return (
     <>
-      {/* Overlay para móvil */}
+      {/* Overlay para móvil - solo para el modal principal */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={onClose}
+        />
+      )}
+
+      {/* Overlay para el modal "Más" */}
+      {isMoreModalOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden"
+          onClick={handleMoreModalClose}
         />
       )}
 
@@ -98,6 +149,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
                   }
                 `}
                 title={isCollapsed ? item.label : undefined}
+                onClick={handleMenuItemClick}
               >
                 <span className={`
                   flex-shrink-0 transition-colors duration-200
@@ -122,7 +174,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
       {/* Sidebar Móvil - Bottom Navigation */}
       <div className="lg:hidden">
         {/* Bottom Navigation Bar */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg">
           <div className="flex justify-around items-center py-2 px-4">
             {mainMenuItems.map((item, index) => (
               <button 
@@ -134,6 +186,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
                     : 'text-gray-600 hover:text-gray-900'
                   }
                 `}
+                onClick={handleMenuItemClick}
               >
                 <span className={`
                   mb-1 transition-colors duration-200
@@ -151,10 +204,22 @@ export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
             ))}
             {/* Botón More para items adicionales */}
             <button 
-              onClick={onClose}
-              className="flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1 text-gray-600 hover:text-gray-900"
+              onClick={handleMoreClick}
+              className={`
+                flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1
+                ${isMoreModalOpen 
+                  ? 'text-blue-600' 
+                  : 'text-gray-600 hover:text-gray-900'
+                }
+              `}
             >
-              <span className="mb-1">
+              <span className={`
+                mb-1 transition-colors duration-200
+                ${isMoreModalOpen 
+                  ? 'text-blue-600' 
+                  : 'text-gray-500'
+                }
+              `}>
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
@@ -169,14 +234,13 @@ export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
       </div>
 
       {/* Modal para más opciones en móvil */}
-      {isOpen && (
+      {isMoreModalOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
-          <div className="fixed bottom-16 left-4 right-4 bg-white rounded-2xl shadow-2xl p-4 max-h-64 overflow-y-auto">
+          <div className="fixed bottom-16 left-4 right-4 bg-white rounded-2xl shadow-2xl p-4 max-h-80 overflow-y-auto border border-gray-100">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold text-gray-900">Más opciones</h3>
               <button
-                onClick={onClose}
+                onClick={handleMoreModalClose}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,8 +252,8 @@ export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
               {additionalItems.map((item, index) => (
                 <button 
                   key={index}
-                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-colors hover:bg-gray-50"
-                  onClick={onClose}
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-colors hover:bg-gray-50 active:bg-gray-100"
+                  onClick={handleMenuItemClick}
                 >
                   <span className="flex-shrink-0 text-gray-500">
                     {item.icon}

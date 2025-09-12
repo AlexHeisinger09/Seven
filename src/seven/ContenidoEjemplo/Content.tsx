@@ -1,4 +1,4 @@
-import { CONTENT_MODULES } from '../utils/constants';
+import { CONTENT_MODULES } from '../../utils/constants';
 
 interface ContentProps {
   isSidebarCollapsed?: boolean;
