@@ -41,7 +41,7 @@ export function Login({ onSuccess }: LoginProps) {
             <img
               src="/logo.png"
               alt="Logo"
-              className="w-16 h-16 mx-auto mb-4"
+              className="w-18 h-18 mx-auto mb-4"
               style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.1))' }}
             />
           </div>
@@ -141,15 +141,33 @@ export function Login({ onSuccess }: LoginProps) {
         </div>
       </div>
 
-      {/* Panel derecho - Hero visual con curva suave (estilo BUK) */}
+      {/* Panel derecho - Hero visual con imagen slide1 de fondo */}
       <div className="hidden lg:block lg:w-[52%] relative">
-        {/* Fondo con degradado */}
-        <div
-          className="absolute inset-0 h-full"
-          style={{
-            background: `linear-gradient(135deg, ${BUK_BLUE} 0%, ${BUK_DARK} 100%)`
-          }}
-        />
+        {/* Imagen de fondo slide1 con overlay minimalista */}
+        <div className="absolute inset-0 h-full">
+          <img
+            src="/slide1.png"
+            alt="Workspace background"
+            className="w-full h-full object-cover"
+            style={{
+              filter: 'brightness(0.4) contrast(1.1) saturate(0.8)',
+              objectPosition: 'center'
+            }}
+          />
+          {/* Overlay degradado para legibilidad y branding */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(135deg, 
+                ${BUK_BLUE}CC 0%, 
+                ${BUK_BLUE}99 30%, 
+                ${BUK_DARK}BB 70%, 
+                ${BUK_DARK}DD 100%)`
+            }}
+          />
+          {/* Overlay adicional para refinar la opacidad */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-indigo-900/30"></div>
+        </div>
 
         {/* Curva de separación: SVG delgado a la izquierda */}
         <svg
@@ -158,110 +176,60 @@ export function Login({ onSuccess }: LoginProps) {
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          {/*
-            Curva menos invasiva:
-            - Para que "entre" menos, sube los valores 45 -> 55 o 60.
-            - Para que "entre" más, baja a 40.
-          */}
           <path d="M100 0 C45 25, 45 75, 100 100 L0 100 L0 0 Z" fill="currentColor" />
         </svg>
 
-        {/* Formas decorativas */}
+        {/* Formas decorativas minimalistas */}
         <div className="absolute inset-0 z-10">
-          <div className="absolute top-20 right-20 w-32 h-32 rounded-full bg-white/5 backdrop-blur-sm"></div>
-          <div className="absolute bottom-32 left-16 w-24 h-24 rounded-full bg-white/10"></div>
-          <div className="absolute top-1/3 left-20 w-16 h-16 rounded-full bg-yellow-400/20"></div>
-
-          {/* Círculo grande de fondo */}
-          <div
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full opacity-10"
-            style={{ background: 'radial-gradient(circle, white 0%, transparent 70%)' }}
-          />
-
-          {/* Ilustración central (igual que la tuya) */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <div className="relative w-64 h-64 flex items-center justify-center">
-              {/* Fondo circular blanco semitransparente */}
-              <div className="absolute inset-0 bg-white/20 rounded-full backdrop-blur-sm border border-white/30"></div>
-
-              {/* Iconos centrales */}
-              <div className="relative z-10 flex items-center justify-center space-x-4">
-                {/* Personas */}
-                <div className="flex items-center space-x-2">
-                  <div className="w-12 h-12 bg-white/30 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="w-10 h-10 bg-pink-400/80 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Candado */}
-                <div
-                  className="w-16 h-16 rounded-xl flex items-center justify-center"
-                  style={{ background: ACCENT_YELLOW }}
-                >
-                  <svg className="w-8 h-8 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-
-                {/* Llave */}
-                <div className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Elementos decorativos sutiles que no compitan con la imagen */}
+          <div className="absolute top-16 right-16 w-20 h-20 rounded-full bg-white/5 backdrop-blur-sm"></div>
+          <div className="absolute bottom-20 left-12 w-16 h-16 rounded-full bg-white/8"></div>
+          
+          {/* Acento de color BUK muy sutil */}
+          <div 
+            className="absolute top-1/4 right-8 w-3 h-24 rounded-full opacity-30"
+            style={{ background: ACCENT_YELLOW }}
+          ></div>
         </div>
 
-        {/* Contenido principal */}
+        {/* Contenido principal con mejor legibilidad sobre la imagen */}
         <div className="relative z-20 flex flex-col justify-center px-16 text-white h-full">
           <div className="max-w-md">
-            <h2 className="text-4xl font-bold leading-tight mb-6">
+            {/* Badge sutil para identidad */}
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
+              <span className="text-sm font-medium text-white/90">BUK Workspace</span>
+            </div>
+
+            <h2 className="text-4xl font-bold leading-tight mb-6 drop-shadow-lg">
               Crea un lugar de trabajo <span style={{ color: ACCENT_YELLOW }}>más feliz :)</span>
             </h2>
 
-            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+            <p className="text-xl text-white/90 mb-8 leading-relaxed drop-shadow-sm">
               Gestiona tu equipo, simplifica procesos y mejora la experiencia laboral de todos.
             </p>
 
-            {/* Características destacadas */}
+            {/* Características destacadas con mejor contraste */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-lg">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <span className="text-blue-100">Gestión simplificada de RRHH</span>
+                <span className="text-white/95 font-medium drop-shadow-sm">Gestión simplificada de RRHH</span>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-lg">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
                   </svg>
                 </div>
-                <span className="text-blue-100">Colaboradores más conectados</span>
+                <span className="text-white/95 font-medium drop-shadow-sm">Colaboradores más conectados</span>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-lg">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       fillRule="evenodd"
@@ -270,7 +238,7 @@ export function Login({ onSuccess }: LoginProps) {
                     />
                   </svg>
                 </div>
-                <span className="text-blue-100">Procesos automatizados</span>
+                <span className="text-white/95 font-medium drop-shadow-sm">Procesos automatizados</span>
               </div>
             </div>
           </div>

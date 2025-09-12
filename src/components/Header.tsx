@@ -1,3 +1,4 @@
+import React from 'react';
 import type { HeaderProps } from '../types';
 import { COLORS } from '../utils/constants';
 
