@@ -197,7 +197,7 @@ export function Login({ onSuccess }: LoginProps) {
           <div className="max-w-md">
             {/* Badge sutil para identidad */}
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
-              <span className="text-sm font-medium text-white/90">BUK Workspace</span>
+              <span className="text-sm font-medium text-white/90">Muelles de Penco</span>
             </div>
 
             <h2 className="text-4xl font-bold leading-tight mb-6 drop-shadow-lg">

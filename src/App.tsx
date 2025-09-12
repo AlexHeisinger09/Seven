@@ -3,7 +3,7 @@ import type { User } from './types';
 import { Login } from './components/Login';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
-import { Content } from './components/Content';
+import { Content } from './seven/Content';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
