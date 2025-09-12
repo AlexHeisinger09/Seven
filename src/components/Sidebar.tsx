@@ -92,11 +92,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <img 
                 src="/logo.png" 
                 alt="Logo" 
-                className="w-8 h-8 rounded"
+                className="w-18 h-18 rounded"
               />
-              <span className="font-semibold text-gray-800 text-sm">
-                MDP TI
-              </span>
+             
             </div>
             <button
               onClick={onClose}
