@@ -30,6 +30,7 @@ export interface SidebarItem {
   icon: string;
   label: string;
   href?: string;
+  isActive?: boolean;
 }
 
 export interface LoginFormData {

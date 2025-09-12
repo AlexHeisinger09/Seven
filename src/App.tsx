@@ -8,9 +8,14 @@ import { Content } from './components/Content';
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const toggleCollapse = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
   const closeSidebar = () => {
@@ -28,12 +33,16 @@ export default function App() {
         onSignOut={() => setUser(null)} 
         isSidebarOpen={isSidebarOpen}
         onToggleSidebar={toggleSidebar}
-        isSidebarCollapsed={false}
-        onToggleCollapse={() => {}}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleCollapse={toggleCollapse}
       />
       <div className="flex flex-1 relative">
-        <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-        <Content isSidebarCollapsed={false} />
+        <Sidebar 
+          isOpen={isSidebarOpen} 
+          isCollapsed={isSidebarCollapsed}
+          onClose={closeSidebar} 
+        />
+        <Content isSidebarCollapsed={isSidebarCollapsed} />
       </div>
     </div>
   );
