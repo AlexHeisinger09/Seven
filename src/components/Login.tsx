@@ -184,7 +184,7 @@ export function Login({ onSuccess }: LoginProps) {
               style={{
                 background: loading
                   ? '#94A3B8'
-                  : `linear-gradient(135deg, ${BUK_BLUE} 0%, ${BUK_DARK} 100%)`,
+                  : BUK_BLUE,
                 boxShadow: loading ? 'none' : '0 4px 15px rgba(46, 73, 183, 0.3)'
               }}
               disabled={loading || !formState.credential.trim()}
