@@ -9,46 +9,77 @@ interface LoginProps {
   onSuccess: (user: Usuario) => void;
 }
 
+type Mode = 'login' | 'forgot';
+
 interface LoginState {
   credential: string;
   password: string;
   showPassword: boolean;
+  mode: Mode;
 }
 
 export function Login({ onSuccess }: LoginProps) {
   const { login, loading, error } = useAuth();
+
   const [formState, setFormState] = useState<LoginState>({
     credential: '',
-    password: '', // Password por defecto según tu API
+    password: '',
     showPassword: false,
+    mode: 'login',
   });
+
+  const [uiMessage, setUiMessage] = useState<string | null>(null);
 
   const updateFormState = (updates: Partial<LoginState>) => {
     setFormState(prev => ({ ...prev, ...updates }));
   };
 
+  const isForgot = formState.mode === 'forgot';
+
+  const canSubmit =
+    !loading &&
+    formState.credential.trim() &&
+    (isForgot || formState.password.trim());
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    if (!formState.credential.trim()) {
+    setUiMessage(null);
+
+    if (isForgot) {
+      // 100% visual (a futuro llamarás al endpoint real)
+      setUiMessage(
+        'Si el correo existe, te enviaremos instrucciones para restablecer la contraseña.'
+      );
       return;
     }
 
+    // === Modo LOGIN (comportamiento anterior) ===
+    if (!formState.credential.trim() || !formState.password.trim()) return;
+
     try {
       await login(formState.credential, formState.password);
+
+      // ✅ Restauramos exactamente lo que te funcionaba
       setTimeout(() => {
-        // Este timeout permite que el estado se actualice
         window.location.reload(); // Forzar recarga para simplicidad
       }, 100);
-      
     } catch (err) {
-      // El error ya está manejado en el hook
       console.error('Error en login:', err);
     }
   };
 
   const togglePasswordVisibility = () => {
     updateFormState({ showPassword: !formState.showPassword });
+  };
+
+  const goToForgot = () => {
+    updateFormState({ mode: 'forgot', showPassword: false });
+    setUiMessage(null);
+  };
+
+  const backToLogin = () => {
+    updateFormState({ mode: 'login' });
+    setUiMessage(null);
   };
 
   return (
@@ -69,16 +100,18 @@ export function Login({ onSuccess }: LoginProps) {
           {/* Título */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              ¡Bienvenido Nuevamente!
+              {isForgot ? '¿Olvidaste tu contraseña?' : '¡Bienvenido Nuevamente!'}
             </h1>
             <p className="text-gray-600">
-              Ingresa tus credenciales para continuar
+              {isForgot
+                ? 'Ingresa tu correo y te enviaremos instrucciones para restablecerla.'
+                : 'Ingresa tus credenciales para continuar'}
             </p>
           </div>
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Campo de credencial (usuario o email) */}
+            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email
@@ -86,7 +119,7 @@ export function Login({ onSuccess }: LoginProps) {
               <div className="relative">
                 <div
                   className={`flex items-center rounded-lg border-2 transition-colors ${
-                    error
+                    (error || uiMessage)
                       ? 'border-red-300 focus-within:border-red-500'
                       : 'border-gray-200 focus-within:border-blue-500'
                   } bg-white`}
@@ -97,129 +130,157 @@ export function Login({ onSuccess }: LoginProps) {
                     </svg>
                   </span>
                   <input
-                    type="text"
+                    type="email"
                     className="flex-1 py-4 px-4 text-gray-900 bg-transparent outline-none placeholder-gray-500"
                     placeholder="correo@empresa.com"
                     value={formState.credential}
                     onChange={(e) => updateFormState({ credential: e.target.value })}
-                    aria-invalid={!!error}
+                    aria-invalid={!!(error || uiMessage)}
                     disabled={loading}
                   />
                 </div>
               </div>
             </div>
 
-            {/* Campo de contraseña */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <div
-                  className={`flex items-center rounded-lg border-2 transition-colors ${
-                    error
-                      ? 'border-red-300 focus-within:border-red-500'
-                      : 'border-gray-200 focus-within:border-blue-500'
-                  } bg-white`}
-                >
-                  <span className="pl-4 text-gray-400">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </span>
-                  <input
-                    type={formState.showPassword ? 'text' : 'password'}
-                    className="flex-1 py-4 px-4 text-gray-900 bg-transparent outline-none placeholder-gray-500"
-                    placeholder="Ingresa tu contraseña"
-                    value={formState.password}
-                    onChange={(e) => updateFormState({ password: e.target.value })}
-                    aria-invalid={!!error}
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="pr-4 text-gray-400 hover:text-gray-600 transition-colors"
-                    disabled={loading}
+            {/* Contraseña (solo en login) */}
+            {!isForgot && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contraseña
+                </label>
+                <div className="relative">
+                  <div
+                    className={`flex items-center rounded-lg border-2 transition-colors ${
+                      error
+                        ? 'border-red-300 focus-within:border-red-500'
+                        : 'border-gray-200 focus-within:border-blue-500'
+                    } bg-white`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                      {formState.showPassword ? (
-                        // Ojo tachado (ocultar contraseña)
-                        <>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m10.73 5.08-1.1-.95A11 11 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.08" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m6.61 6.61A13.5 13.5 0 0 0 1 12s4 8 11 8a9.74 9.74 0 0 0 5.39-1.61" />
-                          <line strokeLinecap="round" strokeLinejoin="round" x1="2" x2="22" y1="2" y2="22" />
-                        </>
-                      ) : (
-                        // Ojo abierto (mostrar contraseña)
-                        <>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                          <circle strokeLinecap="round" strokeLinejoin="round" cx="12" cy="12" r="3" />
-                        </>
-                      )}
-                    </svg>
-                  </button>
-                </div>
-                
-                {/* Mensaje de error */}
-                {error && (
-                  <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    {error}
-                  </p>
-                )}
-              </div>
-            </div>
+                    <span className="pl-4 text-gray-400">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </span>
+                    <input
+                      type={formState.showPassword ? 'text' : 'password'}
+                      className="flex-1 py-4 px-4 text-gray-900 bg-transparent outline-none placeholder-gray-500"
+                      placeholder="Ingresa tu contraseña"
+                      value={formState.password}
+                      onChange={(e) => updateFormState({ password: e.target.value })}
+                      aria-invalid={!!error}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+                      disabled={loading}
+                      aria-label={formState.showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        {formState.showPassword ? (
+                          <>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m10.73 5.08-1.1-.95A11 11 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.08" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m6.61 6.61A13.5 13.5 0 0 0 1 12s4 8 11 8a9.74 9.74 0 0 0 5.39-1.61" />
+                            <line strokeLinecap="round" strokeLinejoin="round" x1="2" x2="22" y1="2" y2="22" />
+                          </>
+                        ) : (
+                          <>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                            <circle strokeLinecap="round" strokeLinejoin="round" cx="12" cy="12" r="3" />
+                          </>
+                        )}
+                      </svg>
+                    </button>
+                  </div>
 
+                  {/* Mensaje de error back */}
+                  {error && (
+                    <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {error}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Mensaje UI (modo forgot) */}
+            {uiMessage && (
+              <p className="text-sm mt-2 text-gray-600 flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {uiMessage}
+              </p>
+            )}
+
+            {/* Botón principal */}
             <button
               type="submit"
               className="w-full py-4 px-6 rounded-lg font-semibold text-white text-lg transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               style={{
-                background: loading
-                  ? '#94A3B8'
-                  : BUK_BLUE,
+                background: loading ? '#94A3B8' : BUK_BLUE,
                 boxShadow: loading ? 'none' : '0 4px 15px rgba(46, 73, 183, 0.3)'
               }}
-              disabled={loading || !formState.credential.trim()}
+              disabled={!canSubmit}
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Verificando...
+                  {isForgot ? 'Procesando...' : 'Verificando...'}
                 </div>
               ) : (
-                'Iniciar Sesión'
+                isForgot ? 'Enviar instrucciones' : 'Iniciar Sesión'
               )}
             </button>
 
             {/* Enlaces adicionales */}
             <div className="text-center space-y-3 pt-4">
-              <button
-                type="button"
-                className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                disabled={loading}
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
-              <div className="flex items-center justify-center">
-                <div className="border-t border-gray-200 flex-1"></div>
-                <span className="px-4 text-xs text-gray-400">o</span>
-                <div className="border-t border-gray-200 flex-1"></div>
-              </div>
-              <button
-                type="button"
-                className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                disabled={loading}
-              >
-                Privacidad y protección de datos
-              </button>
+              {!isForgot ? (
+                <>
+                  <button
+                    type="button"
+                    className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                    disabled={loading}
+                    onClick={goToForgot}
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                  <div className="flex items-center justify-center">
+                    <div className="border-t border-gray-200 flex-1"></div>
+                    <span className="px-4 text-xs text-gray-400">o</span>
+                    <div className="border-t border-gray-200 flex-1"></div>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                    disabled={loading}
+                  >
+                    Privacidad y protección de datos
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                  disabled={loading}
+                  onClick={backToLogin}
+                >
+                  ← Volver a iniciar sesión
+                </button>
+              )}
             </div>
           </form>
         </div>
@@ -289,7 +350,7 @@ export function Login({ onSuccess }: LoginProps) {
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <span className="text-white/95 font-medium drop-shadow-sm">Gestión simplificada de RRHH</span>
+                <span className="text-white/95 font-medium drop-shadow-sm">Colaboradores más conectados</span>
               </div>
 
               <div className="flex items-center gap-4">
@@ -298,7 +359,7 @@ export function Login({ onSuccess }: LoginProps) {
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
                   </svg>
                 </div>
-                <span className="text-white/95 font-medium drop-shadow-sm">Colaboradores más conectados</span>
+                <span className="text-white/95 font-medium drop-shadow-sm">Gestión simplificada de RRHH</span>
               </div>
 
               <div className="flex items-center gap-4">

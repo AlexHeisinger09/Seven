@@ -2,19 +2,19 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 export interface Usuario {
-  usu_cod: number;
-  usu_user: string;
-  usu_rut: string;
-  usu_nombre: string;
-  usu_apellido_p: string;
-  usu_apellido_m: string;
-  usu_email: string;
-  usu_vig_desde: string;
-  usu_vig_hasta: string;
-  usu_tipo: number;
-  usu_ultima_conexion: string | null;
-  usu_ficha: number | null;
-  nombre_completo: string;
+  usuCod: number;
+  usuUser: string;
+  usuRut: string;
+  usuNombre: string;
+  usuApellidoP: string;
+  usuApellidoM: string;
+  usuEmail: string;
+  usuVigDesde: string;
+  usuVigHasta: string;
+  usuTipo: number;
+  usuUltimaConexion: string | null;
+  usuFicha: number | null;
+  nombreCompleto: string;
   vigente: boolean;
 }
 
@@ -73,7 +73,7 @@ export function useAuth() {
         loading: newState.loading,
         error: newState.error,
         isAuthenticated: newState.isAuthenticated,
-        userName: newState.user?.nombre_completo
+        userName: newState.user?.nombreCompleto
       });
       
       return newState;
@@ -170,7 +170,7 @@ export function useAuth() {
         error: null
       });
 
-      console.log('✅ Login exitoso para:', usuario.nombre_completo);
+      console.log('✅ Login exitoso para:', usuario.nombreCompleto);
 
       // Pequeña pausa para asegurar que el estado se propague
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -229,7 +229,7 @@ export function useAuth() {
       if (response.ok) {
         const result: ApiResponse<Usuario> = await response.json();
         if (result.success) {
-          console.log('✅ Token válido, usuario:', result.data.nombre_completo);
+          console.log('✅ Token válido, usuario:', result.data.nombreCompleto);
           updateState({
             user: result.data,
             token: token,
