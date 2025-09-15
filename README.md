@@ -1,4 +1,4 @@
-# MDP TI – Buk-like (React + Vite + Tailwind)
+# MDP TI (React + Vite + Tailwind)
 
 UI de ejemplo inspirada en Buk: login, cabecera y sidebar, con backend simulado.
 

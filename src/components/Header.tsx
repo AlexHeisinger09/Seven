@@ -1,9 +1,11 @@
 // src/components/Header.tsx
 import React, { useState, useRef, useEffect } from 'react';
-import type { HeaderProps } from '../types';
+import { Usuario } from '../hooks/useAuth';
 import { Avatar } from './Avatar';
 
-interface ExtendedHeaderProps extends HeaderProps {
+interface HeaderProps {
+  user: Usuario;
+  onSignOut: () => void;
   isSidebarOpen: boolean;
   isSidebarCollapsed: boolean;
   onToggleSidebar: () => void;
@@ -17,9 +19,17 @@ export function Header({
   isSidebarCollapsed, 
   onToggleSidebar, 
   onToggleCollapse 
-}: ExtendedHeaderProps) {
+}: HeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Debug: Ver qué datos tenemos del usuario
+  console.log('👤 Usuario en Header:', user);
+
+  // Verificar autenticación al cargar la app
+  useEffect(() => {
+    console.log('Header mounted with user:', user);
+  }, [user]);
 
   // Cerrar dropdown al hacer click fuera
   useEffect(() => {
@@ -56,6 +66,42 @@ export function Header({
     }
   };
 
+  // Funciones auxiliares para manejar datos del usuario
+  const getUserDisplayName = (): string => {
+    if (user.nombre_completo) {
+      return user.nombre_completo;
+    }
+    
+    // Construir nombre si no existe nombre_completo
+    const parts = [user.usu_nombre, user.usu_apellido_p, user.usu_apellido_m].filter(Boolean);
+    if (parts.length > 0) {
+      return parts.join(' ');
+    }
+    
+    // Fallback al username
+    return user.usu_user || 'Usuario';
+  };
+
+  const getUserEmail = (): string => {
+    return user.usu_email || 'Sin email';
+  };
+
+  // Detectar género del usuario para el avatar
+  const detectGender = (nombre: string = ''): 'male' | 'female' => {
+    if (!nombre || typeof nombre !== 'string') {
+      return 'male'; // Default
+    }
+    
+    const femaleNames = [
+      'ana', 'maria', 'carmen', 'laura', 'sofia', 'valentina', 
+      'isabella', 'alejandra', 'andrea', 'carolina', 'fernanda',
+      'paula', 'camila', 'natalia', 'daniela', 'gabriela'
+    ];
+    
+    const firstName = nombre.toLowerCase().split(' ')[0];
+    return femaleNames.includes(firstName) ? 'female' : 'male';
+  };
+
   return (
     <header className="h-20 flex items-center bg-white border-b border-gray-200 px-4 lg:px-6 shadow-sm">
       {/* Botón hamburguesa - solo visible en desktop para colapsar */}
@@ -65,7 +111,6 @@ export function Header({
           className="hidden lg:flex p-3 rounded-lg hover:bg-gray-100 transition-colors"
           aria-label="Toggle sidebar"
         >
-          {/* Solo ícono hamburguesa */}
           <svg 
             className={`w-6 h-6 text-gray-600 transition-transform duration-200 ${
               isSidebarCollapsed ? 'rotate-0' : 'rotate-0'
@@ -143,16 +188,17 @@ export function Header({
             onClick={handleProfileClick}
           >
             <Avatar 
-              name="Alex Heisinger"
+              name={getUserDisplayName()}
               size="md"
               className="shadow-sm"
+              gender={detectGender(getUserDisplayName())}
             />
             <div className="hidden sm:block">
               <div className="text-sm font-semibold text-gray-900">
-                Alex Heisinger
+                {getUserDisplayName()}
               </div>
               <div className="text-xs text-gray-500">
-                {user.email}
+                {getUserEmail()}
               </div>
             </div>
             <svg 
@@ -169,7 +215,71 @@ export function Header({
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+            <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 py-3 z-50">
+              {/* Información del usuario en el dropdown */}
+              <div className="px-4 py-3 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <Avatar 
+                    name={getUserDisplayName()}
+                    size="lg"
+                    className="shadow-sm"
+                    gender={detectGender(getUserDisplayName())}
+                  />
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">{getUserDisplayName()}</p>
+                    <p className="text-sm text-gray-600">{getUserEmail()}</p>
+                    <p className="text-xs text-gray-500">RUT: {user.usu_rut || 'No disponible'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Información adicional */}
+              <div className="px-4 py-3 border-b border-gray-100">
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-gray-500">Código:</span>
+                    <p className="font-medium text-gray-900">{user.usu_cod || 'No disponible'}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Usuario:</span>
+                    <p className="font-medium text-gray-900">{user.usu_user || 'No disponible'}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Estado:</span>
+                    <p className={`font-medium ${user.vigente ? 'text-green-600' : 'text-red-600'}`}>
+                      {user.vigente ? 'Activo' : 'Inactivo'}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Tipo:</span>
+                    <p className="font-medium text-gray-900">{user.usu_tipo || 'No disponible'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Última conexión si existe */}
+              {user.usu_ultima_conexion && (
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <span className="text-xs text-gray-500">Última conexión:</span>
+                  <p className="text-xs font-medium text-gray-700">
+                    {new Date(user.usu_ultima_conexion).toLocaleString('es-CL')}
+                  </p>
+                </div>
+              )}
+
+              {/* Opción Mi Perfil */}
+              <button
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  // Navegar a mi perfil
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Mi Perfil
+              </button>
 
               {/* Opción Configuración */}
               <button

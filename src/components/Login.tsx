@@ -1,34 +1,48 @@
+// src/components/Login.tsx
 import { useState, FormEvent } from 'react';
-import type { LoginProps, LoginState } from '../types';
-import { mockLogin } from '../utils/auth';
+import { useAuth, type Usuario } from '../hooks/useAuth';
 import { COLORS } from '../utils/constants';
 
 const { BUK_BLUE, BUK_DARK, ACCENT_YELLOW } = COLORS;
 
+interface LoginProps {
+  onSuccess: (user: Usuario) => void;
+}
+
+interface LoginState {
+  credential: string;
+  password: string;
+  showPassword: boolean;
+}
+
 export function Login({ onSuccess }: LoginProps) {
-  const [state, setState] = useState<LoginState>({
-    email: '',
-    error: '',
-    loading: false,
+  const { login, loading, error } = useAuth();
+  const [formState, setFormState] = useState<LoginState>({
+    credential: '',
+    password: '', // Valor vacío por defecto
+    showPassword: false,
   });
 
-  const updateState = (updates: Partial<LoginState>) => {
-    setState(prev => ({ ...prev, ...updates }));
+  const updateFormState = (updates: Partial<LoginState>) => {
+    setFormState(prev => ({ ...prev, ...updates }));
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    updateState({ error: '', loading: true });
+    
+    if (!formState.credential.trim() || !formState.password.trim()) {
+      return;
+    }
 
     try {
-      const user = await mockLogin(state.email.trim());
-      onSuccess(user);
+      await login(formState.credential, formState.password);
     } catch (err) {
-      updateState({
-        error: err instanceof Error ? err.message : 'Error desconocido',
-        loading: false
-      });
+      console.error('Error en login:', err);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    updateFormState({ showPassword: !formState.showPassword });
   };
 
   return (
@@ -51,37 +65,90 @@ export function Login({ onSuccess }: LoginProps) {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               ¡Bienvenido Nuevamente!
             </h1>
+            <p className="text-gray-600">
+              Ingresa tus credenciales para continuar
+            </p>
           </div>
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Campo de credencial */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+                Usuario o Email
               </label>
               <div className="relative">
                 <div
                   className={`flex items-center rounded-lg border-2 transition-colors ${
-                    state.error
+                    error
                       ? 'border-red-300 focus-within:border-red-500'
                       : 'border-gray-200 focus-within:border-blue-500'
                   } bg-white`}
                 >
                   <span className="pl-4 text-gray-400">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </span>
                   <input
-                    type="email"
+                    type="text"
                     className="flex-1 py-4 px-4 text-gray-900 bg-transparent outline-none placeholder-gray-500"
-                    placeholder="tu@correo.com"
-                    value={state.email}
-                    onChange={(e) => updateState({ email: e.target.value })}
-                    aria-invalid={!!state.error}
+                    placeholder="usuario o correo@empresa.com"
+                    value={formState.credential}
+                    onChange={(e) => updateFormState({ credential: e.target.value })}
+                    disabled={loading}
                   />
                 </div>
-                {state.error && (
+              </div>
+            </div>
+
+            {/* Campo de contraseña */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Contraseña
+              </label>
+              <div className="relative">
+                <div
+                  className={`flex items-center rounded-lg border-2 transition-colors ${
+                    error
+                      ? 'border-red-300 focus-within:border-red-500'
+                      : 'border-gray-200 focus-within:border-blue-500'
+                  } bg-white`}
+                >
+                  <span className="pl-4 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </span>
+                  <input
+                    type={formState.showPassword ? 'text' : 'password'}
+                    className="flex-1 py-4 px-4 text-gray-900 bg-transparent outline-none placeholder-gray-500"
+                    placeholder="Ingresa tu contraseña"
+                    value={formState.password}
+                    onChange={(e) => updateFormState({ password: e.target.value })}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+                    disabled={loading}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {formState.showPassword ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      ) : (
+                        <>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </>
+                      )}
+                    </svg>
+                  </button>
+                </div>
+                
+                {/* Mensaje de error */}
+                {error && (
                   <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path
@@ -90,7 +157,7 @@ export function Login({ onSuccess }: LoginProps) {
                         clipRule="evenodd"
                       />
                     </svg>
-                    {state.error}
+                    {error}
                   </p>
                 )}
               </div>
@@ -100,20 +167,20 @@ export function Login({ onSuccess }: LoginProps) {
               type="submit"
               className="w-full py-4 px-6 rounded-lg font-semibold text-white text-lg transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               style={{
-                background: state.loading
+                background: loading
                   ? '#94A3B8'
                   : `linear-gradient(135deg, ${BUK_BLUE} 0%, ${BUK_DARK} 100%)`,
-                boxShadow: state.loading ? 'none' : '0 4px 15px rgba(46, 73, 183, 0.3)'
+                boxShadow: loading ? 'none' : '0 4px 15px rgba(46, 73, 183, 0.3)'
               }}
-              disabled={state.loading}
+              disabled={loading || !formState.credential.trim() || !formState.password.trim()}
             >
-              {state.loading ? (
+              {loading ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Ingresando...
+                  Validando...
                 </div>
               ) : (
-                'Siguiente'
+                'Iniciar Sesión'
               )}
             </button>
 
@@ -122,6 +189,7 @@ export function Login({ onSuccess }: LoginProps) {
               <button
                 type="button"
                 className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                disabled={loading}
               >
                 ¿Olvidaste tu contraseña?
               </button>
@@ -133,6 +201,7 @@ export function Login({ onSuccess }: LoginProps) {
               <button
                 type="button"
                 className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                disabled={loading}
               >
                 Privacidad y protección de datos
               </button>
@@ -141,9 +210,8 @@ export function Login({ onSuccess }: LoginProps) {
         </div>
       </div>
 
-      {/* Panel derecho - Hero visual con imagen slide1 de fondo */}
+      {/* Panel derecho - Hero visual */}
       <div className="hidden lg:block lg:w-[52%] relative">
-        {/* Imagen de fondo slide1 con overlay minimalista */}
         <div className="absolute inset-0 h-full">
           <img
             src="/slide1.png"
@@ -154,7 +222,6 @@ export function Login({ onSuccess }: LoginProps) {
               objectPosition: 'center'
             }}
           />
-          {/* Overlay degradado para legibilidad y branding */}
           <div
             className="absolute inset-0"
             style={{
@@ -165,11 +232,9 @@ export function Login({ onSuccess }: LoginProps) {
                 ${BUK_DARK}DD 100%)`
             }}
           />
-          {/* Overlay adicional para refinar la opacidad */}
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-indigo-900/30"></div>
         </div>
 
-        {/* Curva de separación: SVG delgado a la izquierda */}
         <svg
           className="absolute top-0 -left-20 h-full w-20 text-gray-50"
           viewBox="0 0 100 100"
@@ -179,23 +244,17 @@ export function Login({ onSuccess }: LoginProps) {
           <path d="M100 0 C45 25, 45 75, 100 100 L0 100 L0 0 Z" fill="currentColor" />
         </svg>
 
-        {/* Formas decorativas minimalistas */}
         <div className="absolute inset-0 z-10">
-          {/* Elementos decorativos sutiles que no compitan con la imagen */}
           <div className="absolute top-16 right-16 w-20 h-20 rounded-full bg-white/5 backdrop-blur-sm"></div>
           <div className="absolute bottom-20 left-12 w-16 h-16 rounded-full bg-white/8"></div>
-          
-          {/* Acento de color BUK muy sutil */}
           <div 
             className="absolute top-1/4 right-8 w-3 h-24 rounded-full opacity-30"
             style={{ background: ACCENT_YELLOW }}
           ></div>
         </div>
 
-        {/* Contenido principal con mejor legibilidad sobre la imagen */}
         <div className="relative z-20 flex flex-col justify-center px-16 text-white h-full">
           <div className="max-w-md">
-            {/* Badge sutil para identidad */}
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
               <span className="text-sm font-medium text-white/90">Muelles de Penco</span>
             </div>
@@ -208,7 +267,6 @@ export function Login({ onSuccess }: LoginProps) {
               Gestiona tu equipo, simplifica procesos y mejora la experiencia laboral de todos.
             </p>
 
-            {/* Características destacadas con mejor contraste */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 flex items-center justify-center shadow-lg">

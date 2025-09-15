@@ -1,14 +1,17 @@
-export interface User {
-  token: string;
-  email: string;
+// src/types/index.ts
+import { Usuario } from '../hooks/useAuth';
+
+// Mantener la interfaz User original para compatibilidad, pero ahora usar Usuario de la API
+export interface User extends Usuario {
+  token?: string; // Opcional para mantener compatibilidad
 }
 
 export interface LoginProps {
-  onSuccess: (user: User) => void;
+  onSuccess: (user: Usuario) => void;
 }
 
 export interface HeaderProps {
-  user: User;
+  user: Usuario;
   onSignOut: () => void;
   isSidebarOpen: boolean;
   isSidebarCollapsed: boolean;
@@ -34,11 +37,12 @@ export interface SidebarItem {
 }
 
 export interface LoginFormData {
-  email: string;
+  credential: string;
+  password: string;
 }
 
 export interface LoginState {
-  email: string;
-  error: string;
-  loading: boolean;
+  credential: string;
+  password: string;
+  showPassword: boolean;
 }
