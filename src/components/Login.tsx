@@ -1,4 +1,4 @@
-// src/components/Login.tsx - ACTUALIZADO PARA CONTEXTO
+// src/components/Login.tsx
 import { useState, FormEvent } from 'react';
 import { useAuth, type Usuario } from '../hooks/useAuth';
 import { COLORS } from '../utils/constants';
@@ -16,10 +16,10 @@ interface LoginState {
 }
 
 export function Login({ onSuccess }: LoginProps) {
-  const { login, loading, error } = useAuth(); // Solo necesitamos estos del contexto
+  const { login, loading, error } = useAuth();
   const [formState, setFormState] = useState<LoginState>({
     credential: '',
-    password: '',
+    password: '', // Password por defecto según tu API
     showPassword: false,
   });
 
@@ -30,16 +30,20 @@ export function Login({ onSuccess }: LoginProps) {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (!formState.credential.trim() || !formState.password.trim()) {
+    if (!formState.credential.trim()) {
       return;
     }
 
     try {
-      console.log('🚀 Enviando login...');
       await login(formState.credential, formState.password);
-      console.log('✅ Login completado en componente Login');
+      setTimeout(() => {
+        // Este timeout permite que el estado se actualice
+        window.location.reload(); // Forzar recarga para simplicidad
+      }, 100);
+      
     } catch (err) {
-      console.error('❌ Error en login componente:', err);
+      // El error ya está manejado en el hook
+      console.error('Error en login:', err);
     }
   };
 
@@ -74,10 +78,10 @@ export function Login({ onSuccess }: LoginProps) {
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Campo de credencial */}
+            {/* Campo de credencial (usuario o email) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Usuario o Email
+                Email
               </label>
               <div className="relative">
                 <div
@@ -89,15 +93,16 @@ export function Login({ onSuccess }: LoginProps) {
                 >
                   <span className="pl-4 text-gray-400">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                     </svg>
                   </span>
                   <input
                     type="text"
                     className="flex-1 py-4 px-4 text-gray-900 bg-transparent outline-none placeholder-gray-500"
-                    placeholder="usuario o correo@empresa.com"
+                    placeholder="correo@empresa.com"
                     value={formState.credential}
                     onChange={(e) => updateFormState({ credential: e.target.value })}
+                    aria-invalid={!!error}
                     disabled={loading}
                   />
                 </div>
@@ -128,6 +133,7 @@ export function Login({ onSuccess }: LoginProps) {
                     placeholder="Ingresa tu contraseña"
                     value={formState.password}
                     onChange={(e) => updateFormState({ password: e.target.value })}
+                    aria-invalid={!!error}
                     disabled={loading}
                   />
                   <button
@@ -136,13 +142,20 @@ export function Login({ onSuccess }: LoginProps) {
                     className="pr-4 text-gray-400 hover:text-gray-600 transition-colors"
                     disabled={loading}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                       {formState.showPassword ? (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                      ) : (
+                        // Ojo tachado (ocultar contraseña)
                         <>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m10.73 5.08-1.1-.95A11 11 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.08" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m6.61 6.61A13.5 13.5 0 0 0 1 12s4 8 11 8a9.74 9.74 0 0 0 5.39-1.61" />
+                          <line strokeLinecap="round" strokeLinejoin="round" x1="2" x2="22" y1="2" y2="22" />
+                        </>
+                      ) : (
+                        // Ojo abierto (mostrar contraseña)
+                        <>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                          <circle strokeLinecap="round" strokeLinejoin="round" cx="12" cy="12" r="3" />
                         </>
                       )}
                     </svg>
@@ -174,12 +187,12 @@ export function Login({ onSuccess }: LoginProps) {
                   : `linear-gradient(135deg, ${BUK_BLUE} 0%, ${BUK_DARK} 100%)`,
                 boxShadow: loading ? 'none' : '0 4px 15px rgba(46, 73, 183, 0.3)'
               }}
-              disabled={loading || !formState.credential.trim() || !formState.password.trim()}
+              disabled={loading || !formState.credential.trim()}
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Validando...
+                  Verificando...
                 </div>
               ) : (
                 'Iniciar Sesión'

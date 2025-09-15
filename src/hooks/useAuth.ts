@@ -1,5 +1,5 @@
-// src/hooks/useAuth.ts - CON IMPORTACIONES CORREGIDAS
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+// src/hooks/useAuth.ts - Versión mejorada con detección automática
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 export interface Usuario {
   usu_cod: number;
@@ -47,20 +47,9 @@ export interface AuthState {
   isAuthenticated: boolean;
 }
 
-interface AuthContextType extends AuthState {
-  login: (credential: string, password: string) => Promise<void>;
-  logout: () => void;
-  validateToken: () => Promise<boolean>;
-  getCurrentUser: () => Promise<Usuario | null>;
-}
-
 const API_BASE_URL = 'http://localhost:8081/api/v1';
 
-// Crear el contexto
-const AuthContext = createContext<AuthContextType | null>(null);
-
-// Provider del contexto
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function useAuth() {
   const [state, setState] = useState<AuthState>({
     user: null,
     token: localStorage.getItem('auth_token'),
@@ -69,9 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: false
   });
 
+  // Ref para evitar loops infinitos
+  const isInitializedRef = useRef(false);
+
   const updateState = useCallback((updates: Partial<AuthState>) => {
     setState(prev => {
       const newState = { ...prev, ...updates };
+      // Calcular isAuthenticated automáticamente
       newState.isAuthenticated = !!(newState.user && newState.token);
       
       console.log('🔄 Estado actualizado:', {
@@ -86,6 +79,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return newState;
     });
   }, []);
+
+  // Efecto para monitorear cambios en localStorage y actualizar estado automáticamente
+  useEffect(() => {
+    const checkAuthState = () => {
+      const token = localStorage.getItem('auth_token');
+      const hasUser = !!state.user;
+      const hasToken = !!token;
+      const shouldBeAuthenticated = hasUser && hasToken;
+      
+      if (state.isAuthenticated !== shouldBeAuthenticated) {
+        console.log('🔄 Estado de autenticación desincronizado, corrigiendo...', {
+          hasUser,
+          hasToken,
+          currentAuth: state.isAuthenticated,
+          shouldBe: shouldBeAuthenticated
+        });
+        
+        setState(prev => ({
+          ...prev,
+          token,
+          isAuthenticated: shouldBeAuthenticated
+        }));
+      }
+    };
+
+    // Verificar cada segundo si hay desincronización
+    const interval = setInterval(checkAuthState, 1000);
+    
+    return () => clearInterval(interval);
+  }, [state.user, state.isAuthenticated]);
 
   const login = useCallback(async (credential: string, password: string): Promise<void> => {
     updateState({ loading: true, error: null });
@@ -122,9 +145,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const result: ApiResponse<LoginResponse> = await response.json();
       console.log('📦 Datos recibidos:', result);
+      console.log('📦 Usuario completo:', result.data.usuario);
 
       if (!result.success) {
         const errorMsg = result.error || result.message || 'Error en el login';
+        if (errorMsg.toLowerCase().includes('credencial') || errorMsg.toLowerCase().includes('inválid')) {
+          throw new Error('Credenciales inválidas. Verifica tu usuario y contraseña.');
+        }
         throw new Error(errorMsg);
       }
 
@@ -134,7 +161,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Guardar token en localStorage
       localStorage.setItem('auth_token', token);
 
-      // Actualizar estado
+      // Actualizar estado INMEDIATAMENTE con isAuthenticated = true
+      console.log('💾 Actualizando estado con login exitoso...');
       updateState({
         user: usuario,
         token: token,
@@ -144,10 +172,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log('✅ Login exitoso para:', usuario.nombre_completo);
 
+      // Pequeña pausa para asegurar que el estado se propague
+      await new Promise(resolve => setTimeout(resolve, 100));
+
     } catch (error) {
       console.error('❌ Error en login:', error);
       
       let errorMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+      
       if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -268,24 +300,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [updateState]);
 
-  return (
-    <AuthContext.Provider value={{
-      ...state,
-      login,
-      logout,
-      validateToken,
-      getCurrentUser
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-// Hook para usar el contexto
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser usado dentro de AuthProvider');
-  }
-  return context;
+  return {
+    user: state.user,
+    token: state.token,
+    loading: state.loading,
+    error: state.error,
+    isAuthenticated: state.isAuthenticated,
+    login,
+    logout,
+    validateToken,
+    getCurrentUser
+  };
 }
