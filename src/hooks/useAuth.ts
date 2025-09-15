@@ -1,5 +1,5 @@
-// src/hooks/useAuth.ts
-import { useState, useCallback } from 'react';
+// src/hooks/useAuth.ts - CON IMPORTACIONES CORREGIDAS
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 export interface Usuario {
   usu_cod: number;
@@ -44,20 +44,47 @@ export interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
+  isAuthenticated: boolean;
+}
+
+interface AuthContextType extends AuthState {
+  login: (credential: string, password: string) => Promise<void>;
+  logout: () => void;
+  validateToken: () => Promise<boolean>;
+  getCurrentUser: () => Promise<Usuario | null>;
 }
 
 const API_BASE_URL = 'http://localhost:8081/api/v1';
 
-export function useAuth() {
+// Crear el contexto
+const AuthContext = createContext<AuthContextType | null>(null);
+
+// Provider del contexto
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
     user: null,
     token: localStorage.getItem('auth_token'),
     loading: false,
-    error: null
+    error: null,
+    isAuthenticated: false
   });
 
   const updateState = useCallback((updates: Partial<AuthState>) => {
-    setState(prev => ({ ...prev, ...updates }));
+    setState(prev => {
+      const newState = { ...prev, ...updates };
+      newState.isAuthenticated = !!(newState.user && newState.token);
+      
+      console.log('🔄 Estado actualizado:', {
+        hasUser: !!newState.user,
+        hasToken: !!newState.token,
+        loading: newState.loading,
+        error: newState.error,
+        isAuthenticated: newState.isAuthenticated,
+        userName: newState.user?.nombre_completo
+      });
+      
+      return newState;
+    });
   }, []);
 
   const login = useCallback(async (credential: string, password: string): Promise<void> => {
@@ -95,22 +122,19 @@ export function useAuth() {
 
       const result: ApiResponse<LoginResponse> = await response.json();
       console.log('📦 Datos recibidos:', result);
-      console.log('📦 Usuario completo:', result.data.usuario);
 
       if (!result.success) {
-        // Si el backend devuelve un mensaje específico, usarlo
         const errorMsg = result.error || result.message || 'Error en el login';
-        if (errorMsg.toLowerCase().includes('credencial') || errorMsg.toLowerCase().includes('inválid')) {
-          throw new Error('Credenciales inválidas. Verifica tu usuario y contraseña.');
-        }
         throw new Error(errorMsg);
       }
 
       const { token, usuario } = result.data;
       console.log('👤 Usuario a guardar:', usuario);
 
+      // Guardar token en localStorage
       localStorage.setItem('auth_token', token);
 
+      // Actualizar estado
       updateState({
         user: usuario,
         token: token,
@@ -124,7 +148,6 @@ export function useAuth() {
       console.error('❌ Error en login:', error);
       
       let errorMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
-      
       if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -143,6 +166,7 @@ export function useAuth() {
   }, [updateState]);
 
   const logout = useCallback(() => {
+    console.log('🚪 Cerrando sesión...');
     localStorage.removeItem('auth_token');
     updateState({
       user: null,
@@ -156,10 +180,12 @@ export function useAuth() {
     const token = localStorage.getItem('auth_token');
     
     if (!token) {
+      console.log('❌ No hay token para validar');
       return false;
     }
 
     try {
+      console.log('🔍 Validando token...');
       const response = await fetch(`${API_BASE_URL}/auth/validate`, {
         method: 'POST',
         headers: {
@@ -171,6 +197,7 @@ export function useAuth() {
       if (response.ok) {
         const result: ApiResponse<Usuario> = await response.json();
         if (result.success) {
+          console.log('✅ Token válido, usuario:', result.data.nombre_completo);
           updateState({
             user: result.data,
             token: token,
@@ -181,6 +208,7 @@ export function useAuth() {
         }
       }
       
+      console.log('❌ Token inválido');
       localStorage.removeItem('auth_token');
       updateState({
         user: null,
@@ -191,7 +219,7 @@ export function useAuth() {
       return false;
 
     } catch (error) {
-      console.error('Error validando token:', error);
+      console.error('❌ Error validando token:', error);
       localStorage.removeItem('auth_token');
       updateState({
         user: null,
@@ -240,15 +268,24 @@ export function useAuth() {
     }
   }, [updateState]);
 
-  return {
-    user: state.user,
-    token: state.token,
-    loading: state.loading,
-    error: state.error,
-    isAuthenticated: !!state.user && !!state.token,
-    login,
-    logout,
-    validateToken,
-    getCurrentUser
-  };
+  return (
+    <AuthContext.Provider value={{
+      ...state,
+      login,
+      logout,
+      validateToken,
+      getCurrentUser
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+// Hook para usar el contexto
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth debe ser usado dentro de AuthProvider');
+  }
+  return context;
 }

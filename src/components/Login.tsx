@@ -1,4 +1,4 @@
-// src/components/Login.tsx
+// src/components/Login.tsx - ACTUALIZADO PARA CONTEXTO
 import { useState, FormEvent } from 'react';
 import { useAuth, type Usuario } from '../hooks/useAuth';
 import { COLORS } from '../utils/constants';
@@ -16,10 +16,10 @@ interface LoginState {
 }
 
 export function Login({ onSuccess }: LoginProps) {
-  const { login, loading, error } = useAuth();
+  const { login, loading, error } = useAuth(); // Solo necesitamos estos del contexto
   const [formState, setFormState] = useState<LoginState>({
     credential: '',
-    password: '', // Valor vacío por defecto
+    password: '',
     showPassword: false,
   });
 
@@ -35,9 +35,11 @@ export function Login({ onSuccess }: LoginProps) {
     }
 
     try {
+      console.log('🚀 Enviando login...');
       await login(formState.credential, formState.password);
+      console.log('✅ Login completado en componente Login');
     } catch (err) {
-      console.error('Error en login:', err);
+      console.error('❌ Error en login componente:', err);
     }
   };
 
