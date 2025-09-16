@@ -118,11 +118,10 @@ export function Login({ onSuccess }: LoginProps) {
               </label>
               <div className="relative">
                 <div
-                  className={`flex items-center rounded-lg border-2 transition-colors ${
-                    (error || uiMessage)
+                  className={`flex items-center rounded-lg border-2 transition-colors ${(error || uiMessage)
                       ? 'border-red-300 focus-within:border-red-500'
                       : 'border-gray-200 focus-within:border-blue-500'
-                  } bg-white`}
+                    } bg-white`}
                 >
                   <span className="pl-4 text-gray-400">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,11 +149,10 @@ export function Login({ onSuccess }: LoginProps) {
                 </label>
                 <div className="relative">
                   <div
-                    className={`flex items-center rounded-lg border-2 transition-colors ${
-                      error
+                    className={`flex items-center rounded-lg border-2 transition-colors ${error
                         ? 'border-red-300 focus-within:border-red-500'
                         : 'border-gray-200 focus-within:border-blue-500'
-                    } bg-white`}
+                      } bg-white`}
                   >
                     <span className="pl-4 text-gray-400">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,19 +309,18 @@ export function Login({ onSuccess }: LoginProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-indigo-900/30"></div>
         </div>
 
-        <svg
-          className="absolute top-0 -left-20 h-full w-20 text-gray-50"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path d="M100 0 C45 25, 45 75, 100 100 L0 100 L0 0 Z" fill="currentColor" />
+        <svg className="absolute top-0 -left-24 h-full w-28 text-gray-50"
+          viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M100 0 C70 20, 70 80, 100 100 L0 100 L0 0 Z"
+            fill="currentColor" />
         </svg>
+
+
 
         <div className="absolute inset-0 z-10">
           <div className="absolute top-16 right-16 w-20 h-20 rounded-full bg-white/5 backdrop-blur-sm"></div>
           <div className="absolute bottom-20 left-12 w-16 h-16 rounded-full bg-white/8"></div>
-          <div 
+          <div
             className="absolute top-1/4 right-8 w-3 h-24 rounded-full opacity-30"
             style={{ background: ACCENT_YELLOW }}
           ></div>
