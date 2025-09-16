@@ -9,6 +9,7 @@ interface AvatarProps {
   gender?: 'male' | 'female' | 'other'; // Género (opcional)
   size?: 'sm' | 'md' | 'lg' | 'xl';     // Tamaño del avatar (opcional)
   className?: string;     // Clases CSS adicionales (opcional)
+   variant?: 'circle' | 'square' | 'rect';
 }
 
 // 2. DEFINIR LOS TAMAÑOS DISPONIBLES
@@ -18,7 +19,13 @@ const sizeClasses = {
   lg: 'w-16 h-16',    // 64px × 64px
   xl: 'w-20 h-20'     // 80px × 80px
 };
-
+// Para el caso rectangular puedes definir un tamaño diferente
+const rectClasses = {
+  sm: 'w-16 h-10',
+  md: 'w-24 h-14',
+  lg: 'w-32 h-20',
+  xl: 'w-40 h-24'
+};
 // 3. FUNCIÓN PARA DETECTAR GÉNERO BASADO EN EL NOMBRE
 const inferGenderFromName = (name: string): 'male' | 'female' => {
   // Lista básica de nombres femeninos comunes en español
@@ -61,7 +68,7 @@ export function Avatar({
             // Si falla la carga de la imagen personalizada, 
             // cambiar a imagen genérica
             const target = e.target as HTMLImageElement;
-            target.src = detectedGender === 'female' ? '/woman.png' : '/men.png';
+            target.src = detectedGender === 'female' ? '/women.png' : '/men.png';
           }}
         />
       </div>
@@ -69,7 +76,7 @@ export function Avatar({
   }
 
   // 7. CASO 2: USAR IMAGEN GENÉRICA
-  const genericImage = detectedGender === 'female' ? '/woman.png' : '/men.png';
+  const genericImage = detectedGender === 'female' ? '/women.png' : '/men.png';
   
   return (
     <div className={`${sizeClasses[size]} rounded-full overflow-hidden ${className}`}>

@@ -7,12 +7,13 @@ interface MiFichaProps {
   isSidebarCollapsed?: boolean;
 }
 
-type TabKey = 'resumen' | 'liquidaciones' | 'documentos' | 'historia' | 'bitacora' | 'asistencia' | 'vacaciones' | 'talento';
+type TabKey = 'resumen' | 'asistencia' | 'vacaciones' | 'horas-extras' | 'permisos' | 'documentos';
 
 interface Tab {
   key: TabKey;
   label: string;
-  hasDropdown?: boolean;
+  icon: React.ReactNode;
+  color: string;
 }
 
 export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
@@ -20,20 +21,88 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
   const { trabajador, loading, error, getMiInformacion } = useTrabajador();
 
   const tabs: Tab[] = [
-    { key: 'resumen', label: 'Resumen' },
-    { key: 'liquidaciones', label: 'Liquidaciones' },
-    { key: 'documentos', label: 'Documentos' },
-    { key: 'historia', label: 'Historia' },
-    { key: 'bitacora', label: 'Bitácora' },
-    { key: 'asistencia', label: 'Asistencia', hasDropdown: true },
-    { key: 'vacaciones', label: 'Vacaciones' },
-    { key: 'talento', label: 'Talento', hasDropdown: true }
+    {
+      key: 'resumen',
+      label: 'Resumen',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>,
+      color: 'bg-blue-600'
+    },
+    {
+      key: 'asistencia',
+      label: 'Registro de asistencia',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" /></svg>,
+      color: 'bg-orange-600'
+    },
+    {
+      key: 'horas-extras',
+      label: 'Horas extras',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" /></svg>,
+      color: 'bg-green-600'
+    },
+    {
+      key: 'vacaciones',
+      label: 'Vacaciones',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>,
+      color: 'bg-blue-500'
+    },
+    {
+      key: 'permisos',
+      label: 'Permisos solicitados',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>,
+      color: 'bg-green-500'
+    },
+    {
+      key: 'documentos',
+      label: 'Documentos',
+      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" /></svg>,
+      color: 'bg-gray-600'
+    }
   ];
 
   // Cargar información del trabajador al montar el componente
   useEffect(() => {
     getMiInformacion();
   }, [getMiInformacion]);
+
+  // Función para determinar el género del avatar
+  const getAvatarGender = (): 'male' | 'female' => {
+    // Si hay foto personalizada, el género no se usa (la foto tiene prioridad)
+    if (trabajador?.traFoto && trabajador.traFoto.trim() !== '') {
+      return 'male'; // Valor por defecto, no se usa porque hay foto personalizada
+    }
+    
+    // Si no hay foto personalizada, usar el género especificado en los datos
+    if (trabajador?.tseNombre?.toLowerCase().includes('femenino')) {
+      return 'female'; // Mostrará women.png
+    }
+    
+    // Por defecto masculino
+    return 'male'; // Mostrará men.png
+  };
+
+  // Generar días del mes (simulado)
+  const generateCalendarDays = () => {
+    const days = [];
+    const today = new Date().getDate();
+    
+    for (let i = 1; i <= 30; i++) {
+      const isToday = i === today;
+      const isWeekend = i % 7 === 0 || (i + 1) % 7 === 0;
+      const isWorked = i <= today && !isWeekend && Math.random() > 0.1;
+      
+      days.push({
+        day: i,
+        isToday,
+        isWeekend,
+        isWorked,
+        hours: isWorked ? '8:00 hrs' : '',
+        status: isWorked ? 'worked' : isWeekend ? 'weekend' : 'pending'
+      });
+    }
+    return days;
+  };
+
+  const calendarDays = generateCalendarDays();
 
   const renderTabContent = () => {
     if (loading) {
@@ -88,201 +157,215 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
     switch (activeTab) {
       case 'resumen':
         return (
-          <div className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* Información laboral */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-4">Información Laboral</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">RUT</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.traRut || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Fecha de Ingreso</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.showTraFechaIngMdp || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Educación</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.eduNombre || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Sindicato</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.sinNombre || 'No aplica'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Licencia</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.licDescripcion || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Pase Portuario</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.traPasePortuario || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Vigencia</span>
-                    <span className={`text-sm font-medium ${trabajador.vigente ? 'text-green-600' : 'text-red-600'}`}>
-                      {trabajador.vigente ? 'Vigente' : 'No Vigente'}
-                    </span>
-                  </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Información Personal */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Información Personal</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">RUT</span>
+                  <span className="text-sm font-medium">{trabajador.traRut}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Fecha de Nacimiento</span>
+                  <span className="text-sm font-medium">{trabajador.showTraFechaNacimiento}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Edad</span>
+                  <span className="text-sm font-medium">{trabajador.edad} años</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Género</span>
+                  <span className="text-sm font-medium">{trabajador.tseNombre}</span>
                 </div>
               </div>
+            </div>
 
-              {/* Información personal */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-4">Información Personal</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Fecha de Nacimiento</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.showTraFechaNacimiento || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Edad</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.edad || 0} años</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Género</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.tseNombre || 'No especificado'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Estado Civil</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.eciNombre || 'No especificado'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Nacionalidad</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.nacDescripcion || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Ciudad</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.ciuNombre || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Cargas Simples</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.traCargasSimple || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Cargas por Invalidez</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.traCargaPorInvalides || 0}</span>
-                  </div>
+            {/* Información Laboral */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Información Laboral</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Ficha</span>
+                  <span className="text-sm font-medium">{trabajador.traFichaTrabajador}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Fecha de Ingreso</span>
+                  <span className="text-sm font-medium">{trabajador.showTraFechaIngMdp}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Cargo</span>
+                  <span className="text-sm font-medium">{trabajador.eduNombre}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Estado</span>
+                  <span className={`text-sm font-medium ${trabajador.vigente ? 'text-green-600' : 'text-red-600'}`}>
+                    {trabajador.vigente ? 'Activo' : 'Inactivo'}
+                  </span>
                 </div>
               </div>
+            </div>
 
-              {/* Información de contacto */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-4">Información de Contacto</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Email</span>
-                    <span className="text-sm font-medium text-gray-900 break-all">{trabajador.traEmail || 'No disponible'}</span>
+            {/* Contacto */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Contacto</h3>
+              <div className="space-y-3">
+                <div>
+                  <span className="text-sm text-gray-500">Email</span>
+                  <p className="text-sm font-medium break-all">{trabajador.traEmail}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Teléfono</span>
+                  <p className="text-sm font-medium">{trabajador.traMovil}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">Dirección</span>
+                  <p className="text-sm font-medium">{trabajador.direccionCompleta}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'asistencia':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Calendario */}
+            <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-900">Septiembre 2025</h3>
+                <div className="flex gap-2">
+                  <button className="p-1 hover:bg-gray-100 rounded">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button className="p-1 hover:bg-gray-100 rounded">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-7 gap-2 mb-4">
+                {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
+                  <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                    {day}
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Teléfono</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.traMovil || 'No disponible'}</span>
+                ))}
+              </div>
+              
+              <div className="grid grid-cols-7 gap-2">
+                {calendarDays.map(day => (
+                  <div
+                    key={day.day}
+                    className={`
+                      relative p-3 rounded-lg text-center text-sm border-2 transition-colors
+                      ${day.isToday 
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold' 
+                        : day.isWorked 
+                          ? 'border-green-200 bg-green-50 text-green-700'
+                          : day.isWeekend
+                            ? 'border-gray-200 bg-gray-50 text-gray-400'
+                            : 'border-gray-200 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    <div className="font-medium">{day.day < 10 ? `0${day.day}` : day.day}</div>
+                    {day.hours && (
+                      <div className="text-xs text-gray-600 mt-1">{day.hours}</div>
+                    )}
                   </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Resumen de horas */}
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-6 text-white">
+                <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm text-gray-600">Dirección</span>
-                    <p className="text-sm font-medium text-gray-900 mt-1">{trabajador.direccionCompleta || 'No disponible'}</p>
+                    <div className="text-3xl font-bold">60 hrs</div>
+                    <div className="text-yellow-100">Total del mes</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold">$120</div>
+                    <div className="text-yellow-100">Monto</div>
                   </div>
                 </div>
               </div>
 
-              {/* Información previsional */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-4">Información Previsional</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">AFP</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.afpNombre || 'No disponible'}</span>
+                <h4 className="font-semibold text-gray-900 mb-4">Detalles</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Investigación de tendencias</span>
+                    <span className="font-medium">2 hr</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Salud</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.salNombre || 'No disponible'}</span>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Desarrollo de portafolio digital</span>
+                    <span className="font-medium">4 hr</span>
                   </div>
-                  {trabajador.traUfIsapre && (
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">UF Isapre</span>
-                      <span className="text-sm font-medium text-gray-900">{trabajador.ufIsapre}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Pensionado</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.pensionado || 'No'}</span>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Análisis de campañas anteriores</span>
+                    <span className="font-medium">2 hr</span>
                   </div>
-                  {trabajador.traEnfermedad && (
-                    <div>
-                      <span className="text-sm text-gray-600">Enfermedad Crónica</span>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{trabajador.cronico}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Información bancaria */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-4">Información Bancaria</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Banco</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.banNombre || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Número de Cuenta</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.traNcuenta || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Forma de Pago</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.fopaDescripcion || 'No disponible'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Información física */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-4">Información Física</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Talla de Ropa</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.traTallaRopa || 'No disponible'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Número de Calzado</span>
-                    <span className="text-sm font-medium text-gray-900">{trabajador.traNumCalzado || 'No disponible'}</span>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Benchmarking de marcas competidoras</span>
+                    <span className="font-medium">1 hr</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         );
-      
-      case 'documentos':
+
+      case 'vacaciones':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Vacaciones Disponibles</h3>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-blue-600 mb-2">15</div>
+                <p className="text-gray-600">días disponibles</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4">Próximo Período</h3>
+              <p className="text-gray-600 mb-2">11 de septiembre - 11 de octubre</p>
+              <div className="grid grid-cols-10 gap-1">
+                {Array.from({length: 10}, (_, i) => (
+                  <div key={i} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
+                    i < 5 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {i + 1 < 10 ? `0${i + 1}` : i + 1}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'permisos':
         return (
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <h3 className="font-semibold text-gray-900 mb-4">Mis Documentos</h3>
-            <div className="space-y-3">
-              {[
-                { name: 'Contrato de Trabajo', date: trabajador?.showTraFechaIngMdp || '15 Mar 2023', type: 'PDF' },
-                { name: 'Certificado de Antecedentes', date: '10 Mar 2023', type: 'PDF' },
-                { name: 'Evaluación de Desempeño 2024', date: '05 Ene 2024', type: 'PDF' },
-                { name: 'Liquidación de Sueldo - Agosto 2024', date: '31 Ago 2024', type: 'PDF' }
-              ].map((doc, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{doc.name}</p>
-                      <p className="text-sm text-gray-500">{doc.type} • {doc.date}</p>
-                    </div>
-                  </div>
-                  <button className="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </button>
+            <h3 className="font-semibold text-gray-900 mb-4">Permisos Solicitados</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div>
+                  <p className="font-medium text-blue-900">Permiso médico</p>
+                  <p className="text-sm text-blue-700">19 - 09 - 2025</p>
                 </div>
-              ))}
+                <span className="px-3 py-1 bg-blue-600 text-white text-xs rounded-full">Aprobado</span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div>
+                  <p className="font-medium text-yellow-900">Permiso personal</p>
+                  <p className="text-sm text-yellow-700">25 - 09 - 2025</p>
+                </div>
+                <span className="px-3 py-1 bg-yellow-600 text-white text-xs rounded-full">Pendiente</span>
+              </div>
             </div>
           </div>
         );
@@ -330,159 +413,89 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
       pb-20 lg:pb-6
       ${isSidebarCollapsed ? 'lg:ml-0' : 'lg:ml-0'}
     `}>
-      <div className="max-w-7xl mx-auto">
-        {/* Cabecera con información del usuario */}
-        <div className="bg-white shadow-sm border-b border-gray-200 p-6 mb-6">
-          {/* Información principal con foto y nombre */}
-          <div className="flex items-start gap-4 mb-6">
-            <Avatar 
-              name={trabajador?.nombreCompleto || 'Usuario'}
-              size="xl"
-              className="shadow-lg flex-shrink-0"
-              gender={trabajador?.tseNombre === 'FEMENINO' ? 'female' : 'male'}
-              src={trabajador?.traFoto}
-            />
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-blue-600 text-sm font-medium">¡Hola!</span>
-                {trabajador?.vigente && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                    Activo
-                  </span>
-                )}
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {trabajador?.nombreCompleto || 'Cargando...'}
-              </h1>
-              <p className="text-lg text-gray-600 mb-4">
-                {trabajador?.eduNombre || 'Trabajador'}
-              </p>
-            </div>
-          </div>
-
-          {/* Grid de información organizada */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Columna 1: Identificación */}
-            <div className="space-y-4">
-              <div className="border-l-4 border-blue-300 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Identificación</h3>
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-gray-500 text-sm">RUT</span>
-                    <p className="font-semibold text-gray-900">{trabajador?.traRut || 'No disponible'}</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 text-sm">Ficha</span>
-                    <p className="font-semibold text-gray-900">{trabajador?.traFichaTrabajador || 'No disponible'}</p>
-                  </div>
-                </div>
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header con información del trabajador */}
+        <div className="mb-6">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-start gap-6">
+              {/* Avatar */}
+              <div className="flex-shrink-0">
+                <Avatar 
+                  name={trabajador?.nombreCompleto || 'Usuario'}
+                  size="xl"
+                  className="shadow-lg border-4 border-white"
+                  gender={getAvatarGender()}
+                  src={trabajador?.traFoto && trabajador.traFoto.trim() !== '' ? trabajador.traFoto : undefined}
+                />
               </div>
               
-              <div className="border-l-4 border-green-300 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Datos Personales</h3>
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-gray-500 text-sm">Cumpleaños</span>
-                    <p className="font-semibold text-gray-900">
-                      {trabajador?.showTraFechaNacimiento || 'No disponible'}
-                      {trabajador?.edad && <span className="text-gray-500"> ({trabajador.edad} años)</span>}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 text-sm">Teléfono</span>
-                    <p className="font-semibold text-gray-900">{trabajador?.traMovil || 'No disponible'}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Columna 2: Contacto y Ubicación */}
-            <div className="space-y-4">
-              <div className="border-l-4 border-purple-300 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Contacto</h3>
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-gray-500 text-sm">Email</span>
-                    <p className="font-semibold text-gray-900 break-all">{trabajador?.traEmail || 'No disponible'}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-l-4 border-orange-300 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Dirección</h3>
-                <div>
-                  <p className="text-gray-700 leading-relaxed">{trabajador?.direccionCompleta || 'No disponible'}</p>
-                  {trabajador?.ciuNombre && (
-                    <p className="text-sm text-gray-500 mt-1">{trabajador.ciuNombre}</p>
+              {/* Información principal */}
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {trabajador?.nombreCompleto || 'Cargando...'}
+                  </h1>
+                  {trabajador?.vigente && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                      Activo
+                    </span>
                   )}
                 </div>
-              </div>
-            </div>
-
-            {/* Columna 3: Información Laboral */}
-            <div className="space-y-4">
-              <div className="border-l-4 border-indigo-300 pl-4">
-                <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Información Laboral</h3>
-                <div className="space-y-2">
+                <p className="text-gray-600 mb-4">{trabajador?.eduNombre || 'Cargo no especificado'}</p>
+                
+                {/* Información básica en línea */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-500 text-sm">Fecha de Ingreso</span>
-                    <p className="font-semibold text-gray-900">{trabajador?.showTraFechaIngMdp || 'No disponible'}</p>
+                    <span className="text-gray-500">RUT</span>
+                    <p className="font-medium text-gray-900">{trabajador?.traRut}</p>
                   </div>
                   <div>
-                    <span className="text-gray-500 text-sm">Empresa</span>
-                    <p className="font-semibold text-gray-900">Muelles de Penco S.A.</p>
+                    <span className="text-gray-500">Email</span>
+                    <p className="font-medium text-gray-900">{trabajador?.traEmail}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Teléfono</span>
+                    <p className="font-medium text-gray-900">{trabajador?.traMovil}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Fecha de ingreso</span>
+                    <p className="font-medium text-gray-900">{trabajador?.showTraFechaIngMdp}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">ID</span>
+                    <p className="font-medium text-gray-900">{trabajador?.traFichaTrabajador}</p>
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className={`w-2 h-2 ${trabajador?.vigente ? 'bg-green-600' : 'bg-red-600'} rounded-full`}></div>
-                  <span className="text-gray-900 font-semibold text-sm">Estado</span>
-                </div>
-                <p className={`font-medium ${trabajador?.vigente ? 'text-green-700' : 'text-red-700'}`}>
-                  {trabajador?.vigente ? 'Empleado Activo' : 'No Vigente'}
-                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Sistema de pestañas */}
-        <div className="px-4 lg:px-6">
-          <div className="mb-6">
-            <div className="border-b border-gray-200">
-              <nav className="flex space-x-8 overflow-x-auto" aria-label="Tabs">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`
-                      group relative min-w-0 flex-shrink-0 py-4 px-1 text-sm font-medium text-center border-b-2 transition-colors whitespace-nowrap
-                      ${activeTab === tab.key
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }
-                    `}
-                  >
-                    <span className="flex items-center gap-2">
-                      {tab.label}
-                      {tab.hasDropdown && (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      )}
-                    </span>
-                  </button>
-                ))}
-              </nav>
-            </div>
+        {/* Pestañas */}
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                  ${activeTab === tab.key
+                    ? `${tab.color} text-white shadow-lg`
+                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                  }
+                `}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Contenido de la pestaña activa */}
-          <div className="pb-8">
-            {renderTabContent()}
-          </div>
+        {/* Contenido de la pestaña activa */}
+        <div>
+          {renderTabContent()}
         </div>
       </div>
     </main>

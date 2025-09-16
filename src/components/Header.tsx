@@ -1,6 +1,7 @@
 // src/components/Header.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { Usuario } from '../hooks/useAuth';
+import { useTrabajador } from '../hooks/useTrabajador'; // ✅ Importar hook del trabajador
 import { Avatar } from './Avatar';
 import { ChangePasswordModal } from '../seven/Configuracion/ChangePasswordModal';
 
@@ -13,25 +14,36 @@ interface HeaderProps {
   onToggleCollapse: () => void;
 }
 
-export function Header({ 
-  user, 
-  onSignOut, 
-  isSidebarOpen, 
-  isSidebarCollapsed, 
-  onToggleSidebar, 
-  onToggleCollapse 
+export function Header({
+  user,
+  onSignOut,
+  isSidebarOpen,
+  isSidebarCollapsed,
+  onToggleSidebar,
+  onToggleCollapse
 }: HeaderProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Debug: Ver qué datos tenemos del usuario
-  console.log('👤 Usuario en Header:', user);
+  // ✅ Hook para obtener información completa del trabajador (incluyendo foto y género)
+  const { trabajador, loading: trabajadorLoading, getMiInformacion } = useTrabajador();
 
-  // Verificar autenticación al cargar la app
+  // ✅ Cargar información del trabajador al montar el Header
   useEffect(() => {
-    console.log('Header mounted with user:', user);
-  }, [user]);
+    getMiInformacion();
+  }, [getMiInformacion]);
+
+  // Debug logs
+  useEffect(() => {
+    if (trabajador) {
+      console.log('👤 Trabajador cargado en Header:', {
+        nombre: trabajador.nombreCompleto,
+        foto: trabajador.traFoto,
+        genero: trabajador.tseNombre
+      });
+    }
+  }, [trabajador]);
 
   // Cerrar dropdown al hacer click fuera
   useEffect(() => {
@@ -51,7 +63,6 @@ export function Header({
 
   const handleConfigClick = () => {
     setIsDropdownOpen(false);
-    // Aquí puedes agregar la lógica para abrir configuración
     console.log('Abrir configuración');
   };
 
@@ -66,47 +77,44 @@ export function Header({
   };
 
   const handleToggleClick = () => {
-    // En desktop usa onToggleCollapse para colapsar/expandir
-    // En móvil no hace nada porque el menú está en la parte inferior
     if (window.innerWidth >= 1024) {
       onToggleCollapse();
     }
   };
 
-  // Funciones auxiliares para manejar datos del usuario
+  // ✅ Función para obtener el nombre completo (prioriza info del trabajador)
   const getUserDisplayName = (): string => {
+    // 1. Priorizar información completa del trabajador
+    if (trabajador?.nombreCompleto) {
+      return trabajador.nombreCompleto;
+    }
+
+    // 2. Fallback a información básica del usuario
     if (user.nombreCompleto) {
       return user.nombreCompleto;
     }
-    
-    // Construir nombre si no existe nombre_completo
+
+    // 3. Construir nombre desde partes individuales
     const parts = [user.usuNombre, user.usuApellidoP, user.usuApellidoM].filter(Boolean);
     if (parts.length > 0) {
       return parts.join(' ');
     }
-    
-    // Fallback al username
+
+    // 4. Último fallback
     return user.usuUser || 'Usuario';
   };
 
+  // ✅ Función para obtener el email (prioriza info del trabajador)
   const getUserEmail = (): string => {
-    return user.usuEmail || 'Sin email';
+    return trabajador?.traEmail || user.usuEmail || 'Sin email';
   };
 
-  // Detectar género del usuario para el avatar
-  const detectGender = (nombre: string = ''): 'male' | 'female' => {
-    if (!nombre || typeof nombre !== 'string') {
-      return 'male'; // Default
-    }
-    
-    const femaleNames = [
-      'ana', 'maria', 'carmen', 'laura', 'sofia', 'valentina', 
-      'isabella', 'alejandra', 'andrea', 'carolina', 'fernanda',
-      'paula', 'camila', 'natalia', 'daniela', 'gabriela'
-    ];
-    
-    const firstName = nombre.toLowerCase().split(' ')[0];
-    return femaleNames.includes(firstName) ? 'female' : 'male';
+  // ✅ Función para determinar género - EXACTAMENTE IGUAL QUE EN MIFICHA
+  const getAvatarGender = (): 'male' | 'female' | 'other' => {
+    const g = trabajador?.tseNombre?.toLowerCase() || '';
+    if (g.includes('femenino') || g.includes('femenina')) return 'female';
+    if (g.includes('masculino') || g.includes('masculina')) return 'male';
+    return 'other';
   };
 
   return (
@@ -119,19 +127,18 @@ export function Header({
             className="hidden lg:flex p-3 rounded-lg hover:bg-gray-100 transition-colors"
             aria-label="Toggle sidebar"
           >
-            <svg 
-              className={`w-6 h-6 text-gray-600 transition-transform duration-200 ${
-                isSidebarCollapsed ? 'rotate-0' : 'rotate-0'
-              }`} 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className={`w-6 h-6 text-gray-600 transition-transform duration-200 ${isSidebarCollapsed ? 'rotate-0' : 'rotate-0'
+                }`}
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M4 6h16M4 12h16M4 18h16" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
           </button>
@@ -149,10 +156,10 @@ export function Header({
         {/* Barra de búsqueda */}
         <div className="flex-1 max-w-2xl mx-6 hidden md:block">
           <div className="relative">
-            <svg 
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -191,15 +198,17 @@ export function Header({
 
           {/* Perfil de usuario con dropdown */}
           <div className="relative" ref={dropdownRef}>
-            <div 
+            <div
               className="flex items-center gap-3 ml-3 p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
               onClick={handleProfileClick}
             >
-              <Avatar 
+              {/* ✅ Avatar con información completa del trabajador */}
+              <Avatar
                 name={getUserDisplayName()}
                 size="md"
                 className="shadow-sm"
-                gender={detectGender(getUserDisplayName())}
+                gender={getAvatarGender()}
+                src={trabajador?.traFoto && trabajador.traFoto.trim() !== '' ? trabajador.traFoto : undefined}
               />
               <div className="hidden sm:block">
                 <div className="text-sm font-semibold text-gray-900">
@@ -209,12 +218,11 @@ export function Header({
                   {getUserEmail()}
                 </div>
               </div>
-              <svg 
-                className={`w-4 h-4 text-gray-400 hidden sm:block transition-transform duration-200 ${
-                  isDropdownOpen ? 'rotate-180' : ''
-                }`} 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className={`w-4 h-4 text-gray-400 hidden sm:block transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                  }`}
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -267,9 +275,9 @@ export function Header({
       </header>
 
       {/* Modal de cambio de contraseña */}
-      <ChangePasswordModal 
-        isOpen={isChangePasswordModalOpen} 
-        onClose={() => setIsChangePasswordModalOpen(false)} 
+      <ChangePasswordModal
+        isOpen={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
       />
     </>
   );

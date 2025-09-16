@@ -183,7 +183,7 @@ export function useTrabajador() {
         if (response.status === 401) {
           throw new Error('Sesión expirada. Inicia sesión nuevamente.');
         } else if (response.status === 404) {
-          throw new Error('No se encontró información del trabajador.');
+          throw new Error('No se encontró información del trabajador asociada a tu usuario.');
         } else if (response.status >= 500) {
           throw new Error('Error del servidor. Intenta nuevamente más tarde.');
         } else {
@@ -195,7 +195,7 @@ export function useTrabajador() {
       console.log('📦 Información del trabajador recibida:', result);
 
       if (!result.success) {
-        const errorMsg = result.error || result.message || 'Error obteniendo información';
+        const errorMsg = result.error || result.message || 'Error obteniendo información del trabajador';
         throw new Error(errorMsg);
       }
 
@@ -213,7 +213,7 @@ export function useTrabajador() {
     } catch (error) {
       console.error('❌ Error obteniendo información del trabajador:', error);
       
-      let errorMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+      let errorMessage = 'Error obteniendo información del trabajador.';
       
       if (error instanceof Error) {
         errorMessage = error.message;
