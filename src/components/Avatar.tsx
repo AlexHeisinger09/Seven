@@ -9,24 +9,26 @@ interface AvatarProps {
   gender?: 'male' | 'female' | 'other'; // Género (opcional)
   size?: 'sm' | 'md' | 'lg' | 'xl';     // Tamaño del avatar (opcional)
   className?: string;     // Clases CSS adicionales (opcional)
-   variant?: 'circle' | 'square' | 'rect';
+  variant?: 'circle' | 'square' | 'rect'; // Nueva propiedad para la forma
 }
 
-// 2. DEFINIR LOS TAMAÑOS DISPONIBLES
+// 2. DEFINIR LOS TAMAÑOS DISPONIBLES PARA CIRCULARES Y CUADRADOS
 const sizeClasses = {
   sm: 'w-8 h-8',      // 32px × 32px
   md: 'w-10 h-10',    // 40px × 40px  
   lg: 'w-16 h-16',    // 64px × 64px
   xl: 'w-20 h-20'     // 80px × 80px
 };
-// Para el caso rectangular puedes definir un tamaño diferente
+
+// 3. DEFINIR LOS TAMAÑOS PARA VARIANTE RECTANGULAR
 const rectClasses = {
-  sm: 'w-16 h-10',
-  md: 'w-24 h-14',
-  lg: 'w-32 h-20',
-  xl: 'w-40 h-24'
+  sm: 'w-16 h-10',    // 64px × 40px
+  md: 'w-24 h-14',    // 96px × 56px
+  lg: 'w-32 h-20',    // 128px × 80px
+  xl: 'w-45 h-60'     // 160px × 96px
 };
-// 3. FUNCIÓN PARA DETECTAR GÉNERO BASADO EN EL NOMBRE
+
+// 4. FUNCIÓN PARA DETECTAR GÉNERO BASADO EN EL NOMBRE
 const inferGenderFromName = (name: string): 'male' | 'female' => {
   // Lista básica de nombres femeninos comunes en español
   const femaleNames = [
@@ -42,24 +44,34 @@ const inferGenderFromName = (name: string): 'male' | 'female' => {
   return femaleNames.includes(firstName) ? 'female' : 'male';
 };
 
-// 4. COMPONENTE PRINCIPAL
+// 5. COMPONENTE PRINCIPAL
 export function Avatar({ 
   src,                    // Imagen personalizada
   alt, 
   name = '',              // Valor por defecto: cadena vacía
   gender,                 // Puede ser undefined
   size = 'md',            // Valor por defecto: tamaño mediano
-  className = ''          // Valor por defecto: sin clases adicionales
+  className = '',         // Valor por defecto: sin clases adicionales
+  variant = 'circle'      // Valor por defecto: circular
 }: AvatarProps) {
   
-  // 5. DETERMINAR EL GÉNERO
+  // 6. DETERMINAR EL GÉNERO
   // Si no se proporciona género, intentar detectarlo del nombre
   const detectedGender = gender || inferGenderFromName(name);
   
-  // 6. CASO 1: SI HAY IMAGEN PERSONALIZADA
+  // 7. DETERMINAR LAS CLASES DE TAMAÑO Y FORMA
+  const isRectangular = variant === 'rect';
+  const sizeClass = isRectangular ? rectClasses[size] : sizeClasses[size];
+  
+  // 8. DETERMINAR LAS CLASES DE BORDER RADIUS
+  const borderRadiusClass = variant === 'circle' ? 'rounded-full' : 
+                           variant === 'square' ? 'rounded-lg' : 
+                           'rounded-xl'; // rectangular
+  
+  // 9. CASO 1: SI HAY IMAGEN PERSONALIZADA
   if (src) {
     return (
-      <div className={`${sizeClasses[size]} rounded-full overflow-hidden ${className}`}>
+      <div className={`${sizeClass} ${borderRadiusClass} overflow-hidden ${className}`}>
         <img
           src={src}
           alt={alt || name}
@@ -75,17 +87,17 @@ export function Avatar({
     );
   }
 
-  // 7. CASO 2: USAR IMAGEN GENÉRICA
+  // 10. CASO 2: USAR IMAGEN GENÉRICA
   const genericImage = detectedGender === 'female' ? '/women.png' : '/men.png';
   
   return (
-    <div className={`${sizeClasses[size]} rounded-full overflow-hidden ${className}`}>
+    <div className={`${sizeClass} ${borderRadiusClass} overflow-hidden ${className}`}>
       <img
         src={genericImage}
         alt={alt || name || 'Avatar'}
         className="w-full h-full object-cover"
         onError={(e) => {
-          // 8. CASO 3: FALLBACK FINAL - MOSTRAR INICIALES
+          // 11. CASO 3: FALLBACK FINAL - MOSTRAR INICIALES
           // Si las imágenes genéricas también fallan
           const target = e.target as HTMLImageElement;
           const parent = target.parentElement;

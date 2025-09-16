@@ -70,12 +70,12 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
     if (trabajador?.traFoto && trabajador.traFoto.trim() !== '') {
       return 'male'; // Valor por defecto, no se usa porque hay foto personalizada
     }
-    
+
     // Si no hay foto personalizada, usar el género especificado en los datos
     if (trabajador?.tseNombre?.toLowerCase().includes('femenino')) {
       return 'female'; // Mostrará women.png
     }
-    
+
     // Por defecto masculino
     return 'male'; // Mostrará men.png
   };
@@ -84,12 +84,12 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
   const generateCalendarDays = () => {
     const days = [];
     const today = new Date().getDate();
-    
+
     for (let i = 1; i <= 30; i++) {
       const isToday = i === today;
       const isWeekend = i % 7 === 0 || (i + 1) % 7 === 0;
       const isWorked = i <= today && !isWeekend && Math.random() > 0.1;
-      
+
       days.push({
         day: i,
         isToday,
@@ -163,16 +163,16 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
               <h3 className="font-semibold text-gray-900 mb-4">Información Personal</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">RUT</span>
-                  <span className="text-sm font-medium">{trabajador.traRut}</span>
+                  <span className="text-sm text-gray-500">Dirección</span>
+                  <span className="text-sm font-medium">{trabajador.traDireccion}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Fecha de Nacimiento</span>
-                  <span className="text-sm font-medium">{trabajador.showTraFechaNacimiento}</span>
+                  <span className="text-sm font-medium">{trabajador.showTraFechaNacimiento} ({trabajador.edad} años)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Edad</span>
-                  <span className="text-sm font-medium">{trabajador.edad} años</span>
+                  <span className="text-sm text-gray-500">Licencia</span>
+                  <span className="text-sm font-medium">{trabajador.licDescripcion}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Género</span>
@@ -181,21 +181,21 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
               </div>
             </div>
 
-            {/* Información Laboral */}
+            {/* Forma de Pago */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4">Información Laboral</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">Forma de Pago</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Ficha</span>
-                  <span className="text-sm font-medium">{trabajador.traFichaTrabajador}</span>
+                  <span className="text-sm text-gray-500">Banco</span>
+                  <span className="text-sm font-medium">{trabajador.banNombre}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Fecha de Ingreso</span>
-                  <span className="text-sm font-medium">{trabajador.showTraFechaIngMdp}</span>
+                  <span className="text-sm text-gray-500">Tipo de Cuenta</span>
+                  <span className="text-sm font-medium">{trabajador.fopaDescripcion}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-500">Cargo</span>
-                  <span className="text-sm font-medium">{trabajador.eduNombre}</span>
+                  <span className="text-sm text-gray-500">N° de Cuenta</span>
+                  <span className="text-sm font-medium">{trabajador.traNcuenta}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Estado</span>
@@ -206,21 +206,25 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
               </div>
             </div>
 
-            {/* Contacto */}
+            {/* Previsión y Salud */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4">Contacto</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">Previsión y Salud</h3>
               <div className="space-y-3">
-                <div>
-                  <span className="text-sm text-gray-500">Email</span>
-                  <p className="text-sm font-medium break-all">{trabajador.traEmail}</p>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">AFP</span>
+                  <span className="text-sm font-medium">{trabajador.afpNombre}</span>
                 </div>
-                <div>
-                  <span className="text-sm text-gray-500">Teléfono</span>
-                  <p className="text-sm font-medium">{trabajador.traMovil}</p>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Salud</span>
+                  <span className="text-sm font-medium">{trabajador.salNombre}</span>
                 </div>
-                <div>
-                  <span className="text-sm text-gray-500">Dirección</span>
-                  <p className="text-sm font-medium">{trabajador.direccionCompleta}</p>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">APV %</span>
+                  <span className="text-sm font-medium">{trabajador.afpApvPorc}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Pensionado</span>
+                  <span className="text-sm font-medium">{trabajador.pensionado}</span>
                 </div>
               </div>
             </div>
@@ -247,7 +251,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                   </button>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-7 gap-2 mb-4">
                 {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
                   <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
@@ -255,16 +259,16 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                   </div>
                 ))}
               </div>
-              
+
               <div className="grid grid-cols-7 gap-2">
                 {calendarDays.map(day => (
                   <div
                     key={day.day}
                     className={`
                       relative p-3 rounded-lg text-center text-sm border-2 transition-colors
-                      ${day.isToday 
-                        ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold' 
-                        : day.isWorked 
+                      ${day.isToday
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold'
+                        : day.isWorked
                           ? 'border-green-200 bg-green-50 text-green-700'
                           : day.isWeekend
                             ? 'border-gray-200 bg-gray-50 text-gray-400'
@@ -335,10 +339,9 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
               <h3 className="font-semibold text-gray-900 mb-4">Próximo Período</h3>
               <p className="text-gray-600 mb-2">11 de septiembre - 11 de octubre</p>
               <div className="grid grid-cols-10 gap-1">
-                {Array.from({length: 10}, (_, i) => (
-                  <div key={i} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                    i < 5 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                  }`}>
+                {Array.from({ length: 10 }, (_, i) => (
+                  <div key={i} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${i < 5 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                    }`}>
                     {i + 1 < 10 ? `0${i + 1}` : i + 1}
                   </div>
                 ))}
@@ -419,16 +422,17 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-start gap-6">
               {/* Avatar */}
-              <div className="flex-shrink-0">
-                <Avatar 
+              <div className="flex-shrink-0 mx-auto lg:mx-0">
+                <Avatar
                   name={trabajador?.nombreCompleto || 'Usuario'}
                   size="xl"
+                  variant="rect"
                   className="shadow-lg border-4 border-white"
                   gender={getAvatarGender()}
                   src={trabajador?.traFoto && trabajador.traFoto.trim() !== '' ? trabajador.traFoto : undefined}
                 />
               </div>
-              
+
               {/* Información principal */}
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -442,7 +446,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                   )}
                 </div>
                 <p className="text-gray-600 mb-4">{trabajador?.eduNombre || 'Cargo no especificado'}</p>
-                
+
                 {/* Información básica en línea */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div>
@@ -462,8 +466,12 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                     <p className="font-medium text-gray-900">{trabajador?.showTraFechaIngMdp}</p>
                   </div>
                   <div>
-                    <span className="text-gray-500">ID</span>
+                    <span className="text-gray-500">Ficha</span>
                     <p className="font-medium text-gray-900">{trabajador?.traFichaTrabajador}</p>
+                  </div>
+                   <div>
+                    <span className="text-gray-500">Sindicato</span>
+                    <p className="font-medium text-gray-900">{trabajador?.sinNombre} </p>
                   </div>
                 </div>
               </div>
