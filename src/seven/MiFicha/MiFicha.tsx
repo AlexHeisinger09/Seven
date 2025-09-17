@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { Avatar } from '../../components/Avatar';
 import { useTrabajador, type Trabajador } from '../../hooks/useTrabajador';
+import { Resumen } from './Tabs/Resumen';
+import { Asistencia } from './Tabs/Asistencia';
 
 interface MiFichaProps {
   isSidebarCollapsed?: boolean;
@@ -12,7 +14,7 @@ type TabKey = 'resumen' | 'asistencia' | 'vacaciones' | 'horas-extras' | 'permis
 interface Tab {
   key: TabKey;
   label: string;
-  shortLabel?: string; // Etiqueta corta para móvil
+  shortLabel?: string;
   icon: React.ReactNode;
   color: string;
 }
@@ -66,50 +68,21 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
     }
   ];
 
-  // Cargar información del trabajador al montar el componente
   useEffect(() => {
     getMiInformacion();
   }, [getMiInformacion]);
 
-  // Función para determinar el género del avatar
   const getAvatarGender = (): 'male' | 'female' => {
-    // Si hay foto personalizada, el género no se usa (la foto tiene prioridad)
     if (trabajador?.traFoto && trabajador.traFoto.trim() !== '') {
-      return 'male'; // Valor por defecto, no se usa porque hay foto personalizada
+      return 'male';
     }
 
-    // Si no hay foto personalizada, usar el género especificado en los datos
     if (trabajador?.tseNombre?.toLowerCase().includes('femenino')) {
-      return 'female'; // Mostrará women.png
+      return 'female';
     }
 
-    // Por defecto masculino
-    return 'male'; // Mostrará men.png
+    return 'male';
   };
-
-  // Generar días del mes (simulado)
-  const generateCalendarDays = () => {
-    const days = [];
-    const today = new Date().getDate();
-
-    for (let i = 1; i <= 30; i++) {
-      const isToday = i === today;
-      const isWeekend = i % 7 === 0 || (i + 1) % 7 === 0;
-      const isWorked = i <= today && !isWeekend && Math.random() > 0.1;
-
-      days.push({
-        day: i,
-        isToday,
-        isWeekend,
-        isWorked,
-        hours: isWorked ? '8:00 hrs' : '',
-        status: isWorked ? 'worked' : isWeekend ? 'weekend' : 'pending'
-      });
-    }
-    return days;
-  };
-
-  const calendarDays = generateCalendarDays();
 
   const renderTabContent = () => {
     if (loading) {
@@ -163,174 +136,10 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
 
     switch (activeTab) {
       case 'resumen':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            {/* Información Personal */}
-            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4">Información Personal</h3>
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Dirección</span>
-                  <span className="text-sm font-medium text-right">{trabajador.traDireccion}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Fecha de Nacimiento</span>
-                  <span className="text-sm font-medium text-right">{trabajador.showTraFechaNacimiento} ({trabajador.edad} años)</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Licencia</span>
-                  <span className="text-sm font-medium text-right">{trabajador.licDescripcion}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Género</span>
-                  <span className="text-sm font-medium text-right">{trabajador.tseNombre}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Forma de Pago */}
-            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4">Forma de Pago</h3>
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Banco</span>
-                  <span className="text-sm font-medium text-right">{trabajador.banNombre}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Tipo de Cuenta</span>
-                  <span className="text-sm font-medium text-right">{trabajador.fopaDescripcion}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">N° de Cuenta</span>
-                  <span className="text-sm font-medium text-right">{trabajador.traNcuenta}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Estado</span>
-                  <span className={`text-sm font-medium text-right ${trabajador.vigente ? 'text-green-600' : 'text-red-600'}`}>
-                    {trabajador.vigente ? 'Activo' : 'Inactivo'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Previsión y Salud */}
-            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4">Previsión y Salud</h3>
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">AFP</span>
-                  <span className="text-sm font-medium text-right">{trabajador.afpNombre}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Salud</span>
-                  <span className="text-sm font-medium text-right">{trabajador.salNombre}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">APV %</span>
-                  <span className="text-sm font-medium text-right">{trabajador.afpApvPorc}</span>
-                </div>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span className="text-sm text-gray-500">Pensionado</span>
-                  <span className="text-sm font-medium text-right">{trabajador.pensionado}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <Resumen trabajador={trabajador} />;
 
       case 'asistencia':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            {/* Calendario */}
-            <div className="lg:col-span-2 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">Septiembre 2025</h3>
-                <div className="flex gap-2">
-                  <button className="p-1 hover:bg-gray-100 rounded">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <button className="p-1 hover:bg-gray-100 rounded">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4">
-                {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
-                  <div key={day} className="text-center text-xs md:text-sm font-medium text-gray-500 py-2">
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-7 gap-1 md:gap-2">
-                {calendarDays.map(day => (
-                  <div
-                    key={day.day}
-                    className={`
-                      relative p-2 md:p-3 rounded-lg text-center text-xs md:text-sm border-2 transition-colors
-                      ${day.isToday
-                        ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold'
-                        : day.isWorked
-                          ? 'border-green-200 bg-green-50 text-green-700'
-                          : day.isWeekend
-                            ? 'border-gray-200 bg-gray-50 text-gray-400'
-                            : 'border-gray-200 hover:border-gray-300'
-                      }
-                    `}
-                  >
-                    <div className="font-medium">{day.day < 10 ? `0${day.day}` : day.day}</div>
-                    {day.hours && (
-                      <div className="text-xs text-gray-600 mt-1 hidden md:block">{day.hours}</div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Resumen de horas */}
-            <div className="space-y-4 md:space-y-6">
-              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-4 md:p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-2xl md:text-3xl font-bold">60 hrs</div>
-                    <div className="text-yellow-100 text-sm">Total del mes</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xl md:text-2xl font-bold">$120</div>
-                    <div className="text-yellow-100 text-sm">Monto</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-                <h4 className="font-semibold text-gray-900 mb-4">Detalles</h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Investigación de tendencias</span>
-                    <span className="font-medium">2 hr</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Desarrollo de portafolio digital</span>
-                    <span className="font-medium">4 hr</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Análisis de campañas anteriores</span>
-                    <span className="font-medium">2 hr</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Benchmarking de marcas competidoras</span>
-                    <span className="font-medium">1 hr</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <Asistencia />;
 
       case 'vacaciones':
         return (
@@ -399,7 +208,6 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
     }
   };
 
-  // Mostrar loading mientras se carga la información inicial
   if (loading && !trabajador) {
     return (
       <main className={`flex-1 bg-gray-50 min-h-[calc(100vh-5rem)] w-full overflow-x-hidden transition-all duration-300 ease-in-out pb-20 lg:pb-6 ${isSidebarCollapsed ? 'lg:ml-0' : 'lg:ml-0'}`}>
@@ -428,7 +236,6 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
         <div className="mb-6">
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
             <div className="flex flex-col lg:flex-row items-start gap-4 md:gap-6">
-              {/* Avatar - Centrado en móvil, alineado a la izquierda en desktop (ORIGINAL) */}
               <div className="flex-shrink-0 mx-auto lg:mx-0">
                 <Avatar
                   name={trabajador?.nombreCompleto || 'Usuario'}
@@ -440,7 +247,6 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                 />
               </div>
 
-              {/* Información principal - EXACTAMENTE COMO EL ORIGINAL EN DESKTOP */}
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-xl md:text-2xl font-bold text-gray-900">
@@ -458,7 +264,6 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                 </div>
                 <p className="text-gray-600 mb-4">{trabajador?.eduNombre || 'Cargo no especificado'}</p>
 
-                {/* Información básica en línea - EXACTAMENTE COMO EL ORIGINAL EN DESKTOP */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-500">RUT</span>
@@ -490,7 +295,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
           </div>
         </div>
 
-        {/* Pestañas - RESPONSIVO */}
+        {/* Pestañas */}
         <div className="mb-6">
           {/* Pestañas para desktop y tablet */}
           <div className="hidden sm:flex flex-wrap gap-2">
