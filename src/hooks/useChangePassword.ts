@@ -1,5 +1,5 @@
-// src/hooks/useChangePassword.ts
 import { useState, useCallback } from 'react';
+import { useNotification } from '../contexts/NotificationContext';
 
 export interface ChangePasswordRequest {
   currentPassword: string;
@@ -24,6 +24,8 @@ export function useChangePassword() {
     message: null
   });
 
+  const { showSuccess, showError } = useNotification();
+
   const updateState = useCallback((updates: Partial<ChangePasswordState>) => {
     setState(prev => ({ ...prev, ...updates }));
   }, []);
@@ -34,9 +36,10 @@ export function useChangePassword() {
     try {
       // Validar que las contraseñas nuevas coincidan
       if (request.newPassword !== request.confirmPassword) {
+        const errorMsg = 'Las contraseñas nuevas no coinciden';
         updateState({
           loading: false,
-          error: 'Las contraseñas nuevas no coinciden',
+          error: errorMsg,
           success: false
         });
         return false;
@@ -44,9 +47,10 @@ export function useChangePassword() {
 
       // Validar longitud mínima
       if (request.newPassword.length < 1) {
+        const errorMsg = 'La nueva contraseña no puede estar vacía';
         updateState({
           loading: false,
-          error: 'La nueva contraseña no puede estar vacía',
+          error: errorMsg,
           success: false
         });
         return false;
@@ -54,11 +58,13 @@ export function useChangePassword() {
 
       const token = localStorage.getItem('auth_token');
       if (!token) {
+        const errorMsg = 'No hay sesión activa';
         updateState({
           loading: false,
-          error: 'No hay sesión activa',
+          error: errorMsg,
           success: false
         });
+        showError(errorMsg);
         return false;
       }
 
@@ -80,16 +86,32 @@ export function useChangePassword() {
 
       if (response.ok && result.success) {
         // Éxito
+        const successMsg = 'Contraseña cambiada exitosamente';
         updateState({
           loading: false,
           error: null,
           success: true,
-          message: 'Contraseña cambiada exitosamente'
+          message: successMsg
         });
+        showSuccess('¡Contraseña cambiada exitosamente!');
         return true;
       } else {
-        // Error del servidor
-        const errorMessage = result.message || result.error || 'Error al cambiar la contraseña';
+        // Error del servidor - Mejorar mensajes de error comunes
+        let errorMessage = result.message || result.error || 'Error al cambiar la contraseña';
+        
+        // Mensajes más amigables para errores específicos
+        if (errorMessage.includes('clave antigua no conincide') || 
+            errorMessage.includes('contraseña actual no es correcta') ||
+            errorMessage.includes('password is incorrect')) {
+          errorMessage = 'La contraseña actual no es correcta. Verifica e intenta nuevamente.';
+        } else if (errorMessage.includes('contraseña muy corta') || 
+                   errorMessage.includes('password too short')) {
+          errorMessage = 'La nueva contraseña debe tener al menos 6 caracteres.';
+        } else if (errorMessage.includes('contraseñas deben ser diferentes') ||
+                   errorMessage.includes('same password')) {
+          errorMessage = 'La nueva contraseña debe ser diferente a la actual.';
+        }
+        
         updateState({
           loading: false,
           error: errorMessage,
@@ -101,10 +123,14 @@ export function useChangePassword() {
     } catch (error) {
       console.error('❌ Error en cambio de contraseña:', error);
       
-      let errorMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+      let errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión e intenta nuevamente.';
       
       if (error instanceof Error) {
-        errorMessage = error.message;
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+        } else {
+          errorMessage = error.message;
+        }
       }
 
       updateState({
@@ -113,9 +139,10 @@ export function useChangePassword() {
         success: false
       });
 
+      showError(errorMessage);
       return false;
     }
-  }, [updateState]);
+  }, [updateState, showSuccess, showError]);
 
   const clearState = useCallback(() => {
     setState({

@@ -12,6 +12,7 @@ type TabKey = 'resumen' | 'asistencia' | 'vacaciones' | 'horas-extras' | 'permis
 interface Tab {
   key: TabKey;
   label: string;
+  shortLabel?: string; // Etiqueta corta para móvil
   icon: React.ReactNode;
   color: string;
 }
@@ -24,37 +25,43 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
     {
       key: 'resumen',
       label: 'Resumen',
-      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>,
+      shortLabel: 'Resumen',
+      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>,
       color: 'bg-blue-600'
     },
     {
       key: 'asistencia',
       label: 'Registro de asistencia',
-      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" /></svg>,
+      shortLabel: 'Asistencia',
+      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" /></svg>,
       color: 'bg-orange-600'
     },
     {
       key: 'horas-extras',
       label: 'Horas extras',
-      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" /></svg>,
+      shortLabel: 'H. Extras',
+      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" /></svg>,
       color: 'bg-green-600'
     },
     {
       key: 'vacaciones',
       label: 'Vacaciones',
-      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>,
+      shortLabel: 'Vacaciones',
+      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>,
       color: 'bg-blue-500'
     },
     {
       key: 'permisos',
       label: 'Permisos solicitados',
-      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>,
+      shortLabel: 'Permisos',
+      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>,
       color: 'bg-green-500'
     },
     {
       key: 'documentos',
       label: 'Documentos',
-      icon: <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" /></svg>,
+      shortLabel: 'Docs',
+      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" /></svg>,
       color: 'bg-gray-600'
     }
   ];
@@ -157,49 +164,49 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
     switch (activeTab) {
       case 'resumen':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             {/* Información Personal */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-4">Información Personal</h3>
               <div className="space-y-3">
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Dirección</span>
-                  <span className="text-sm font-medium">{trabajador.traDireccion}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.traDireccion}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Fecha de Nacimiento</span>
-                  <span className="text-sm font-medium">{trabajador.showTraFechaNacimiento} ({trabajador.edad} años)</span>
+                  <span className="text-sm font-medium text-right">{trabajador.showTraFechaNacimiento} ({trabajador.edad} años)</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Licencia</span>
-                  <span className="text-sm font-medium">{trabajador.licDescripcion}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.licDescripcion}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Género</span>
-                  <span className="text-sm font-medium">{trabajador.tseNombre}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.tseNombre}</span>
                 </div>
               </div>
             </div>
 
             {/* Forma de Pago */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-4">Forma de Pago</h3>
               <div className="space-y-3">
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Banco</span>
-                  <span className="text-sm font-medium">{trabajador.banNombre}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.banNombre}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Tipo de Cuenta</span>
-                  <span className="text-sm font-medium">{trabajador.fopaDescripcion}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.fopaDescripcion}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">N° de Cuenta</span>
-                  <span className="text-sm font-medium">{trabajador.traNcuenta}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.traNcuenta}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Estado</span>
-                  <span className={`text-sm font-medium ${trabajador.vigente ? 'text-green-600' : 'text-red-600'}`}>
+                  <span className={`text-sm font-medium text-right ${trabajador.vigente ? 'text-green-600' : 'text-red-600'}`}>
                     {trabajador.vigente ? 'Activo' : 'Inactivo'}
                   </span>
                 </div>
@@ -207,24 +214,24 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
             </div>
 
             {/* Previsión y Salud */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-4">Previsión y Salud</h3>
               <div className="space-y-3">
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">AFP</span>
-                  <span className="text-sm font-medium">{trabajador.afpNombre}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.afpNombre}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Salud</span>
-                  <span className="text-sm font-medium">{trabajador.salNombre}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.salNombre}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">APV %</span>
-                  <span className="text-sm font-medium">{trabajador.afpApvPorc}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.afpApvPorc}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span className="text-sm text-gray-500">Pensionado</span>
-                  <span className="text-sm font-medium">{trabajador.pensionado}</span>
+                  <span className="text-sm font-medium text-right">{trabajador.pensionado}</span>
                 </div>
               </div>
             </div>
@@ -233,9 +240,9 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
 
       case 'asistencia':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             {/* Calendario */}
-            <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="lg:col-span-2 bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900">Septiembre 2025</h3>
                 <div className="flex gap-2">
@@ -252,20 +259,20 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-7 gap-2 mb-4">
+              <div className="grid grid-cols-7 gap-1 md:gap-2 mb-4">
                 {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
-                  <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                  <div key={day} className="text-center text-xs md:text-sm font-medium text-gray-500 py-2">
                     {day}
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-1 md:gap-2">
                 {calendarDays.map(day => (
                   <div
                     key={day.day}
                     className={`
-                      relative p-3 rounded-lg text-center text-sm border-2 transition-colors
+                      relative p-2 md:p-3 rounded-lg text-center text-xs md:text-sm border-2 transition-colors
                       ${day.isToday
                         ? 'border-blue-500 bg-blue-50 text-blue-700 font-bold'
                         : day.isWorked
@@ -278,7 +285,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                   >
                     <div className="font-medium">{day.day < 10 ? `0${day.day}` : day.day}</div>
                     {day.hours && (
-                      <div className="text-xs text-gray-600 mt-1">{day.hours}</div>
+                      <div className="text-xs text-gray-600 mt-1 hidden md:block">{day.hours}</div>
                     )}
                   </div>
                 ))}
@@ -286,21 +293,21 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
             </div>
 
             {/* Resumen de horas */}
-            <div className="space-y-6">
-              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-6 text-white">
+            <div className="space-y-4 md:space-y-6">
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-4 md:p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-3xl font-bold">60 hrs</div>
-                    <div className="text-yellow-100">Total del mes</div>
+                    <div className="text-2xl md:text-3xl font-bold">60 hrs</div>
+                    <div className="text-yellow-100 text-sm">Total del mes</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold">$120</div>
-                    <div className="text-yellow-100">Monto</div>
+                    <div className="text-xl md:text-2xl font-bold">$120</div>
+                    <div className="text-yellow-100 text-sm">Monto</div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
                 <h4 className="font-semibold text-gray-900 mb-4">Detalles</h4>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
@@ -327,20 +334,20 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
 
       case 'vacaciones':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-4">Vacaciones Disponibles</h3>
               <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">15</div>
+                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">15</div>
                 <p className="text-gray-600">días disponibles</p>
               </div>
             </div>
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-900 mb-4">Próximo Período</h3>
               <p className="text-gray-600 mb-2">11 de septiembre - 11 de octubre</p>
-              <div className="grid grid-cols-10 gap-1">
+              <div className="grid grid-cols-5 md:grid-cols-10 gap-1">
                 {Array.from({ length: 10 }, (_, i) => (
-                  <div key={i} className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${i < 5 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                  <div key={i} className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs font-medium ${i < 5 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                     }`}>
                     {i + 1 < 10 ? `0${i + 1}` : i + 1}
                   </div>
@@ -352,22 +359,22 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
 
       case 'permisos':
         return (
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
             <h3 className="font-semibold text-gray-900 mb-4">Permisos Solicitados</h3>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-blue-50 rounded-lg border border-blue-200 gap-3">
                 <div>
                   <p className="font-medium text-blue-900">Permiso médico</p>
                   <p className="text-sm text-blue-700">19 - 09 - 2025</p>
                 </div>
-                <span className="px-3 py-1 bg-blue-600 text-white text-xs rounded-full">Aprobado</span>
+                <span className="px-3 py-1 bg-blue-600 text-white text-xs rounded-full self-start sm:self-center">Aprobado</span>
               </div>
-              <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200 gap-3">
                 <div>
                   <p className="font-medium text-yellow-900">Permiso personal</p>
                   <p className="text-sm text-yellow-700">25 - 09 - 2025</p>
                 </div>
-                <span className="px-3 py-1 bg-yellow-600 text-white text-xs rounded-full">Pendiente</span>
+                <span className="px-3 py-1 bg-yellow-600 text-white text-xs rounded-full self-start sm:self-center">Pendiente</span>
               </div>
             </div>
           </div>
@@ -375,7 +382,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
 
       default:
         return (
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -396,7 +403,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
   if (loading && !trabajador) {
     return (
       <main className={`flex-1 bg-gray-50 min-h-[calc(100vh-5rem)] w-full overflow-x-hidden transition-all duration-300 ease-in-out pb-20 lg:pb-6 ${isSidebarCollapsed ? 'lg:ml-0' : 'lg:ml-0'}`}>
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="max-w-7xl mx-auto p-4 md:p-6">
           <div className="flex justify-center items-center py-20">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
@@ -416,12 +423,12 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
       pb-20 lg:pb-6
       ${isSidebarCollapsed ? 'lg:ml-0' : 'lg:ml-0'}
     `}>
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
         {/* Header con información del trabajador */}
         <div className="mb-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-start gap-6">
-              {/* Avatar */}
+          <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
+            <div className="flex flex-col lg:flex-row items-start gap-4 md:gap-6">
+              {/* Avatar - Centrado en móvil, alineado a la izquierda en desktop (ORIGINAL) */}
               <div className="flex-shrink-0 mx-auto lg:mx-0">
                 <Avatar
                   name={trabajador?.nombreCompleto || 'Usuario'}
@@ -433,22 +440,26 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                 />
               </div>
 
-              {/* Información principal */}
+              {/* Información principal - EXACTAMENTE COMO EL ORIGINAL EN DESKTOP */}
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-2xl font-bold text-gray-900">
+                  <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                     {trabajador?.nombreCompleto || 'Cargando...'}
                   </h1>
-                  {trabajador?.vigente && (
+                  {trabajador?.vigente ? (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                       Activo
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                      No Vigente
                     </span>
                   )}
                 </div>
                 <p className="text-gray-600 mb-4">{trabajador?.eduNombre || 'Cargo no especificado'}</p>
 
-                {/* Información básica en línea */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                {/* Información básica en línea - EXACTAMENTE COMO EL ORIGINAL EN DESKTOP */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-500">RUT</span>
                     <p className="font-medium text-gray-900">{trabajador?.traRut}</p>
@@ -469,9 +480,9 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                     <span className="text-gray-500">Ficha</span>
                     <p className="font-medium text-gray-900">{trabajador?.traFichaTrabajador}</p>
                   </div>
-                   <div>
+                  <div>
                     <span className="text-gray-500">Sindicato</span>
-                    <p className="font-medium text-gray-900">{trabajador?.sinNombre} </p>
+                    <p className="font-medium text-gray-900">{trabajador?.sinNombre}</p>
                   </div>
                 </div>
               </div>
@@ -479,15 +490,16 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
           </div>
         </div>
 
-        {/* Pestañas */}
+        {/* Pestañas - RESPONSIVO */}
         <div className="mb-6">
-          <div className="flex flex-wrap gap-2">
+          {/* Pestañas para desktop y tablet */}
+          <div className="hidden sm:flex flex-wrap gap-2">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`
-                  flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                  flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all
                   ${activeTab === tab.key
                     ? `${tab.color} text-white shadow-lg`
                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
@@ -495,9 +507,55 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                 `}
               >
                 {tab.icon}
-                {tab.label}
+                <span className="hidden md:inline">{tab.label}</span>
+                <span className="md:hidden">{tab.shortLabel || tab.label}</span>
               </button>
             ))}
+          </div>
+
+          {/* Pestañas para móvil - Dropdown */}
+          <div className="sm:hidden">
+            <div className="relative">
+              <button
+                onClick={() => {
+                  const dropdown = document.getElementById('mobile-tabs-dropdown');
+                  dropdown?.classList.toggle('hidden');
+                }}
+                className="w-full flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-sm"
+              >
+                <div className="flex items-center gap-2">
+                  {tabs.find(tab => tab.key === activeTab)?.icon}
+                  <span className="font-medium text-gray-900">
+                    {tabs.find(tab => tab.key === activeTab)?.shortLabel || tabs.find(tab => tab.key === activeTab)?.label}
+                  </span>
+                </div>
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <div id="mobile-tabs-dropdown" className="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => {
+                      setActiveTab(tab.key);
+                      document.getElementById('mobile-tabs-dropdown')?.classList.add('hidden');
+                    }}
+                    className={`
+                      w-full flex items-center gap-3 px-4 py-3 text-left transition-colors first:rounded-t-lg last:rounded-b-lg
+                      ${activeTab === tab.key
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'hover:bg-gray-50'
+                      }
+                    `}
+                  >
+                    {tab.icon}
+                    <span className="font-medium">{tab.shortLabel || tab.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

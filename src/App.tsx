@@ -1,10 +1,10 @@
-// src/App.tsx
 import { useState, useEffect } from 'react';
 import { useAuth, type Usuario } from './hooks/useAuth';
 import { Login } from './components/Login';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { RouterProvider, useRouter } from './hooks/useRouter';
+import { NotificationProvider } from './contexts/NotificationContext'; // 👈 NUEVO IMPORT
 
 function AppContent() {
   const { user, logout, validateToken, getCurrentUser, isAuthenticated } = useAuth();
@@ -69,7 +69,7 @@ function AppContent() {
     return <Login onSuccess={(user: Usuario) => {
       // Esta función se llama después del login exitoso
       // pero el estado ya debería estar actualizado por el hook
-      console.log('Login exitoso para:', user.nombre_completo);
+      console.log('Login exitoso para:', user.nombreCompleto);
     }} />;
   }
 
@@ -101,8 +101,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <RouterProvider>
-      <AppContent />
-    </RouterProvider>
+    <NotificationProvider> {/* 👈 ENVOLVER CON EL PROVIDER DE NOTIFICACIONES */}
+      <RouterProvider>
+        <AppContent />
+      </RouterProvider>
+    </NotificationProvider>
   );
 }
