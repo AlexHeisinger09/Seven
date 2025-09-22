@@ -71,6 +71,73 @@ export function useAsistencia() {
   const updateState = useCallback((updates: Partial<AsistenciaState>) => {
     setState(prev => ({ ...prev, ...updates }));
   }, []);
+  const getTodasAsistencias = useCallback(async (page: number = 0, size: number = 100, anio?: number): Promise<AsistenciaRecord[]> => {
+    updateState({ loading: true, error: null });
+
+    try {
+      const token = localStorage.getItem('auth_token');
+      
+      if (!token) {
+        throw new Error('No hay sesión activa');
+      }
+
+      let url = `${API_BASE_URL}/asistencia/me/todas?page=${page}&size=${size}`;
+      if (anio) {
+        url += `&anio=${anio}`;
+      }
+
+      console.log(`📋 Obteniendo todas las asistencias (página ${page + 1}, tamaño ${size}${anio ? `, año ${anio}` : ''})...`);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Sesión expirada. Inicia sesión nuevamente.');
+        } else {
+          throw new Error(`Error del servidor. Código: ${response.status}`);
+        }
+      }
+
+      const result: ApiResponse<AsistenciaRecord[]> = await response.json();
+
+      if (!result.success) {
+        const errorMsg = result.error || result.message || 'Error obteniendo todas las asistencias';
+        throw new Error(errorMsg);
+      }
+
+      const asistencias = result.data || [];
+      console.log(`✅ Se obtuvieron ${asistencias.length} asistencias totales`);
+
+      updateState({
+        asistencias: page === 0 ? asistencias : [...state.asistencias, ...asistencias],
+        loading: false,
+        error: null
+      });
+
+      return asistencias;
+
+    } catch (error) {
+      console.error('❌ Error obteniendo todas las asistencias:', error);
+      
+      let errorMessage = 'Error obteniendo todas las asistencias.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      updateState({
+        loading: false,
+        error: errorMessage
+      });
+
+      return [];
+    }
+  }, [updateState, state.asistencias]);
 
   const getAsistenciaMensual = useCallback(async (anio: number, mes: number): Promise<AsistenciaRecord[]> => {
     updateState({ loading: true, error: null });
@@ -358,7 +425,7 @@ export function useAsistencia() {
     }
   }, [updateState]);
 
-  const clearState = useCallback(() => {
+   const clearState = useCallback(() => {
     setState({
       asistencias: [],
       diasConAsistencia: [],
@@ -386,6 +453,7 @@ export function useAsistencia() {
     getDiasConAsistencia,
     getEstadisticasMensuales,
     getUltimasAsistencias,
+    getTodasAsistencias,
     clearState
   };
 }
