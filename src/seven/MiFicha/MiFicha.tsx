@@ -16,7 +16,13 @@ interface Tab {
   label: string;
   shortLabel?: string;
   icon: React.ReactNode;
-  color: string;
+  colors: {
+    bg: string;
+    bgHover: string;
+    text: string;
+    border: string;
+    hoverBorder: string;
+  };
 }
 
 export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
@@ -28,43 +34,103 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
       key: 'resumen',
       label: 'Resumen',
       shortLabel: 'Resumen',
-      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>,
-      color: 'bg-blue-600'
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+        </svg>
+      ),
+      colors: {
+        bg: 'bg-gradient-to-r from-blue-600 to-blue-700',
+        bgHover: 'bg-gradient-to-r from-blue-700 to-blue-800',
+        text: 'text-white',
+        border: 'border-blue-300',
+        hoverBorder: 'border-blue-400'
+      }
     },
     {
       key: 'asistencia',
       label: 'Registro de asistencia',
       shortLabel: 'Asistencia',
-      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" /></svg>,
-      color: 'bg-orange-600'
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+        </svg>
+      ),
+      colors: {
+        bg: 'bg-gradient-to-r from-blue-600 to-blue-700',
+        bgHover: 'bg-gradient-to-r from-blue-700 to-blue-800',
+        text: 'text-white',
+        border: 'border-blue-300',
+        hoverBorder: 'border-blue-400'
+      }
     },
     {
       key: 'horas-extras',
       label: 'Horas extras',
       shortLabel: 'H. Extras',
-      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" /></svg>,
-      color: 'bg-green-600'
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+        </svg>
+      ),
+      colors: {
+        bg: 'bg-gradient-to-r from-blue-600 to-blue-700',
+        bgHover: 'bg-gradient-to-r from-blue-700 to-blue-800',
+        text: 'text-white',
+        border: 'border-blue-300',
+        hoverBorder: 'border-blue-400'
+      }
     },
     {
       key: 'vacaciones',
       label: 'Vacaciones',
       shortLabel: 'Vacaciones',
-      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>,
-      color: 'bg-blue-500'
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ),
+      colors: {
+        bg: 'bg-gradient-to-r from-blue-600 to-blue-700',
+        bgHover: 'bg-gradient-to-r from-blue-700 to-blue-800',
+        text: 'text-white',
+        border: 'border-blue-300',
+        hoverBorder: 'border-blue-400'
+      }
     },
     {
       key: 'permisos',
       label: 'Permisos solicitados',
       shortLabel: 'Permisos',
-      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>,
-      color: 'bg-green-500'
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+        </svg>
+      ),
+      colors: {
+        bg: 'bg-gradient-to-r from-blue-600 to-blue-700',
+        bgHover: 'bg-gradient-to-r from-blue-700 to-blue-800',
+        text: 'text-white',
+        border: 'border-blue-300',
+        hoverBorder: 'border-blue-400'
+      }
     },
     {
       key: 'documentos',
       label: 'Documentos',
       shortLabel: 'Docs',
-      icon: <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" /></svg>,
-      color: 'bg-gray-600'
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+        </svg>
+      ),
+      colors: {
+        bg: 'bg-gradient-to-r from-blue-600 to-blue-700',
+        bgHover: 'bg-gradient-to-r from-blue-700 to-blue-800',
+        text: 'text-white',
+        border: 'border-blue-300',
+        hoverBorder: 'border-blue-400'
+      }
     }
   ];
 
@@ -295,7 +361,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
           </div>
         </div>
 
-        {/* Pestañas */}
+        {/* Pestañas con nuevos colores azules */}
         <div className="mb-6">
           {/* Pestañas para desktop y tablet */}
           <div className="hidden sm:flex flex-wrap gap-2">
@@ -304,10 +370,11 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`
-                  flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all
+                  flex items-center gap-2 px-3 md:px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium 
+                  transition-all duration-200 transform hover:scale-105 shadow-sm
                   ${activeTab === tab.key
-                    ? `${tab.color} text-white shadow-lg`
-                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                    ? `${tab.colors.bg} ${tab.colors.text} shadow-lg ring-2 ring-blue-200 ring-offset-1`
+                    : `bg-white text-gray-600 hover:bg-gray-50 border ${tab.colors.border} hover:${tab.colors.hoverBorder} hover:text-gray-800`
                   }
                 `}
               >
@@ -318,7 +385,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
             ))}
           </div>
 
-          {/* Pestañas para móvil - Dropdown */}
+          {/* Pestañas para móvil - Dropdown mejorado */}
           <div className="sm:hidden">
             <div className="relative">
               <button
@@ -326,7 +393,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                   const dropdown = document.getElementById('mobile-tabs-dropdown');
                   dropdown?.classList.toggle('hidden');
                 }}
-                className="w-full flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-sm"
+                className="w-full flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-2">
                   {tabs.find(tab => tab.key === activeTab)?.icon}
@@ -350,13 +417,18 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
                     className={`
                       w-full flex items-center gap-3 px-4 py-3 text-left transition-colors first:rounded-t-lg last:rounded-b-lg
                       ${activeTab === tab.key
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'hover:bg-gray-50'
+                        ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500'
+                        : 'hover:bg-gray-50 text-gray-700'
                       }
                     `}
                   >
                     {tab.icon}
                     <span className="font-medium">{tab.shortLabel || tab.label}</span>
+                    {activeTab === tab.key && (
+                      <svg className="w-4 h-4 text-blue-600 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
                   </button>
                 ))}
               </div>

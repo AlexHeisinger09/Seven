@@ -153,7 +153,13 @@ export function Asistencia() {
       });
 
       const hasWork = dayAsistencias.length > 0;
-      const hasAssistance = dayAsistencias.some(a => a.tieneAsistencia);
+      
+      // 🔥 MEJORA: Verificar correctamente si no asistió
+      const hasAssistance = dayAsistencias.some(a => {
+        // Si dasiAusencia es "1", significa que NO asistió
+        if (a.dasiAusencia === "1") return false;
+        return a.tieneAsistencia;
+      });
 
       let status: CalendarDay['status'];
       if (isFuture) {
@@ -241,19 +247,41 @@ export function Asistencia() {
     }
   };
 
-  // Función para obtener el resumen de horas del día
-  const getDaySummary = (day: CalendarDay) => {
-    if (!day.hasWork) return null;
+  // 🔥 FUNCIÓN PARA DETERMINAR EL ESTADO DE ASISTENCIA
+  const getAttendanceStatus = (asistencia: AsistenciaRecord) => {
+    // Si dasiAusencia es "1", significa que NO asistió
+    if (asistencia.dasiAusencia === "1") {
+      return {
+        attended: false,
+        label: 'No Asistió',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200',
+        textColor: 'text-red-700',
+        badgeColor: 'bg-red-100 text-red-700'
+      };
+    }
     
-    const totalHours = day.asistencias.reduce((sum, a) => {
-      if (a.horaEntrada && a.horaSalida) {
-        // Calcular horas trabajadas (simplificado)
-        return sum + 8; // Asumimos 8 horas por día con asistencia
-      }
-      return sum;
-    }, 0);
-
-    return totalHours > 0 ? `${totalHours}h` : null;
+    // Si tieneAsistencia es true, asistió
+    if (asistencia.tieneAsistencia) {
+      return {
+        attended: true,
+        label: 'Asistió',
+        bgColor: 'bg-green-50',
+        borderColor: 'border-green-200',
+        textColor: 'text-green-700',
+        badgeColor: 'bg-green-100 text-green-700'
+      };
+    }
+    
+    // Por defecto, ausente
+    return {
+      attended: false,
+      label: 'Ausente',
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-200',
+      textColor: 'text-red-700',
+      badgeColor: 'bg-red-100 text-red-700'
+    };
   };
 
   const canGoNext = () => {
@@ -341,8 +369,6 @@ export function Asistencia() {
                 {day.day < 10 ? `0${day.day}` : day.day}
               </div>
               
-              {/* Quitar el resumen de horas - ya no se muestra getDaySummary(day) */}
-              
               {/* Indicadores de estado */}
               {day.hasWork && (
                 <div className="absolute top-1 right-1">
@@ -366,7 +392,7 @@ export function Asistencia() {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="text-gray-600">Ausente</span>
+            <span className="text-gray-600">No asistió</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
@@ -431,63 +457,139 @@ export function Asistencia() {
           </div>
         )}
 
-        {/* Detalle del día seleccionado */}
+        {/* 🔥 DETALLE DEL DÍA SELECCIONADO - DISEÑO MEJORADO */}
         {selectedDay && (
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-gray-900">
-                {selectedDay.day} de {MONTHS[viewMonth]}
-              </h4>
-              <button
-                onClick={() => setSelectedDay(null)}
-                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {selectedDay.asistencias.map((asistencia, index) => (
-                <div
-                  key={`${asistencia.faeCod}-${index}`}
-                  className={`p-3 rounded-lg border ${
-                    asistencia.tieneAsistencia 
-                      ? 'bg-green-50 border-green-200' 
-                      : 'bg-red-50 border-red-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900">
-                      {asistencia.turnoNombre}
-                    </span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      asistencia.tieneAsistencia 
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}>
-                      {asistencia.tieneAsistencia ? 'Asistió' : 'Ausente'}
-                    </span>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* Header del panel */}
+            <div className="bg-white border-b border-gray-100 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                    </svg>
                   </div>
-                  
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <div>Faena: {asistencia.tfaDescripcion}</div>
-                    {asistencia.carNombre && (
-                      <div>Cargo: {asistencia.carNombre}</div>
-                    )}
-                    <div className="flex justify-between">
-                      <span>Entrada: {asistencia.horaEntrada || 'No registrada'}</span>
-                      <span>Salida: {asistencia.horaSalida || 'No registrada'}</span>
-                    </div>
-                    {asistencia.dasiAusencia && (
-                      <div className="text-red-600">
-                        Motivo ausencia: {asistencia.dasiAusencia}
-                      </div>
-                    )}
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900">
+                      {selectedDay.day} de {MONTHS[viewMonth]}
+                    </h4>
+                    <p className="text-gray-500 text-sm">
+                      {selectedDay.asistencias.length} registro{selectedDay.asistencias.length !== 1 ? 's' : ''}
+                    </p>
                   </div>
                 </div>
-              ))}
+                <button
+                  onClick={() => setSelectedDay(null)}
+                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Contenido del panel */}
+            <div className="p-6">
+              <div className="space-y-4">
+                {selectedDay.asistencias.map((asistencia, index) => {
+                  const status = getAttendanceStatus(asistencia);
+                  
+                  return (
+                    <div
+                      key={`${asistencia.faeCod}-${index}`}
+                      className="border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow"
+                    >
+                      {/* Header de la asistencia */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h5 className="font-semibold text-gray-900 text-sm">
+                              {asistencia.turnoNombre}
+                            </h5>
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${status.badgeColor}`}>
+                              {status.label}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500">
+                            {asistencia.tfaDescripcion}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Detalles de horarios */}
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                            <div>
+                              <p className="text-xs text-gray-500 font-medium">Entrada</p>
+                              <p className="text-sm text-gray-900 font-semibold">
+                                {asistencia.horaEntrada || 'No registrada'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <div>
+                              <p className="text-xs text-gray-500 font-medium">Salida</p>
+                              <p className="text-sm text-gray-900 font-semibold">
+                                {asistencia.horaSalida || 'No registrada'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Información adicional */}
+                      <div className="space-y-2">
+                        {asistencia.carNombre && (
+                          <div className="flex items-center gap-2 text-xs text-gray-600">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                            </svg>
+                            <span>Cargo: {asistencia.carNombre}</span>
+                          </div>
+                        )}
+                        
+                        {asistencia.dasiAusencia === "1" && (
+                          <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 p-2 rounded-lg">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <span>Ausencia registrada en el sistema</span>
+                          </div>
+                        )}
+
+                        {/* Mostrar fecha planificada */}
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span>Fecha planificada: {asistencia.showFechaPlanif || asistencia.faeFechaInicialPlanif}</span>
+                        </div>
+
+                        {/* Mostrar hora planificada si existe */}
+                        {asistencia.faeHoraInicialPlanif && (
+                          <div className="flex items-center gap-2 text-xs text-gray-600">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Hora planificada: {asistencia.faeHoraInicialPlanif}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
