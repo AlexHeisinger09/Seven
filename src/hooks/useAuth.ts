@@ -1,4 +1,4 @@
-// src/hooks/useAuth.ts - Versión mejorada con detección automática
+// src/hooks/useAuth.ts - CON SOPORTE PARA RUT
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 export interface Usuario {
@@ -58,13 +58,11 @@ export function useAuth() {
     isAuthenticated: false
   });
 
-  // Ref para evitar loops infinitos
   const isInitializedRef = useRef(false);
 
   const updateState = useCallback((updates: Partial<AuthState>) => {
     setState(prev => {
       const newState = { ...prev, ...updates };
-      // Calcular isAuthenticated automáticamente
       newState.isAuthenticated = !!(newState.user && newState.token);
       
       console.log('🔄 Estado actualizado:', {
@@ -80,7 +78,6 @@ export function useAuth() {
     });
   }, []);
 
-  // Efecto para monitorear cambios en localStorage y actualizar estado automáticamente
   useEffect(() => {
     const checkAuthState = () => {
       const token = localStorage.getItem('auth_token');
@@ -104,7 +101,6 @@ export function useAuth() {
       }
     };
 
-    // Verificar cada segundo si hay desincronización
     const interval = setInterval(checkAuthState, 1000);
     
     return () => clearInterval(interval);
@@ -119,7 +115,11 @@ export function useAuth() {
         password: password
       };
 
-      console.log('🔐 Iniciando login con:', { credential: loginData.credential });
+      console.log('🔐 Iniciando login con:', { 
+        credential: loginData.credential,
+        isEmail: loginData.credential.includes('@'),
+        isRut: /^[\d.-]+[kK\d]$/.test(loginData.credential.replace(/\s/g, ''))
+      });
 
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
@@ -133,7 +133,7 @@ export function useAuth() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Credenciales inválidas. Verifica tu usuario y contraseña.');
+          throw new Error('Credenciales inválidas. Verifica tu usuario/RUT y contraseña.');
         } else if (response.status === 403) {
           throw new Error('Acceso denegado. Tu cuenta podría estar inactiva.');
         } else if (response.status >= 500) {
@@ -150,7 +150,7 @@ export function useAuth() {
       if (!result.success) {
         const errorMsg = result.error || result.message || 'Error en el login';
         if (errorMsg.toLowerCase().includes('credencial') || errorMsg.toLowerCase().includes('inválid')) {
-          throw new Error('Credenciales inválidas. Verifica tu usuario y contraseña.');
+          throw new Error('Credenciales inválidas. Verifica tu correo/RUT y contraseña.');
         }
         throw new Error(errorMsg);
       }
