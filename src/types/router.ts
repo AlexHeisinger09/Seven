@@ -2,6 +2,7 @@
 export type RouteKey = 
   | 'portal'
   | 'mi-ficha'
+  | 'liquidaciones'
   | 'beneficios'
   | 'reconocimientos'
   | 'configuracion'

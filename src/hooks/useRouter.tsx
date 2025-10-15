@@ -5,7 +5,8 @@ import type { RouteKey, RouterContextType, Route } from '../types/router';
 // Importaciones dinámicas de componentes
 import { Content } from '../seven/ContenidoEjemplo/Content';
 import { MiFicha } from '../seven/MiFicha/MiFicha';
-import { Portal} from '../seven/Portal/Portal';
+import { Portal } from '../seven/Portal/Portal';
+import { Liquidaciones } from '../seven/Liquidaciones/Liquidaciones';
 
 // Componente placeholder mientras creas las páginas
 const PlaceholderPage = ({ title }: { title: string }) => (
@@ -36,7 +37,7 @@ const createRoutes = (): Route[] => [
         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
       </svg>
     ),
-     component: Portal, 
+    component: Portal,
     isActive: true
   },
   {
@@ -47,8 +48,18 @@ const createRoutes = (): Route[] => [
         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
       </svg>
     ),
-    component: MiFicha, 
+    component: MiFicha,
     isActive: true
+  },
+  {
+    key: 'liquidaciones',
+    label: 'Ver mis liquidaciones',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    component: Liquidaciones,
   },
   {
     key: 'beneficios',
