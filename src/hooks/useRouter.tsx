@@ -36,7 +36,7 @@ const createRoutes = (): Route[] => [
         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
       </svg>
     ),
-     component: Portal, // Usa el componente existente por ahora
+     component: Portal, 
     isActive: true
   },
   {
@@ -47,7 +47,7 @@ const createRoutes = (): Route[] => [
         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
       </svg>
     ),
-    component: MiFicha, // Usa el componente existente por ahora
+    component: MiFicha, 
     isActive: true
   },
   {
@@ -59,17 +59,6 @@ const createRoutes = (): Route[] => [
       </svg>
     ),
     component: () => <PlaceholderPage title="Beneficios" />
-  },
-  {
-    key: 'mis-encuestas',
-    label: 'Mis Encuestas',
-    icon: (
-      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-        <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 00-1 1v6a1 1 0 001 1v1a2 2 0 01-2-2V5zM16 5a2 2 0 00-2-2v1a1 1 0 011 1v6a1 1 0 01-1 1v1a2 2 0 002-2V5z" clipRule="evenodd" />
-      </svg>
-    ),
-    component: () => <PlaceholderPage title="Mis Encuestas" />
   },
   {
     key: 'reconocimientos',

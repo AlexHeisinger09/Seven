@@ -1,15 +1,16 @@
-// src/seven/MiFicha/MiFicha.tsx
+// src/seven/MiFicha/MiFicha.tsx - ACTUALIZADO CON NOMBRADAS
 import { useState, useEffect } from 'react';
 import { Avatar } from '../../components/Avatar';
 import { useTrabajador, type Trabajador } from '../../hooks/useTrabajador';
 import { Resumen } from './Tabs/Resumen';
 import { Asistencia } from './Tabs/Asistencia';
+import { NombradasTab } from './Tabs/Nombradas';
 
 interface MiFichaProps {
   isSidebarCollapsed?: boolean;
 }
 
-type TabKey = 'resumen' | 'asistencia' | 'vacaciones' | 'horas-extras' | 'permisos' | 'documentos';
+type TabKey = 'resumen' | 'nombradas' | 'asistencia'  | 'horas-extras' | 'permisos' | 'documentos'; // ACTUALIZADO
 
 interface Tab {
   key: TabKey;
@@ -48,6 +49,23 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
       }
     },
     {
+      key: 'nombradas',
+      label: 'Nombradas',
+      shortLabel: 'Nombradas',
+      icon: (
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+        </svg>
+      ),
+      colors: {
+        bg: 'bg-gradient-to-r from-blue-600 to-blue-700',
+        bgHover: 'bg-gradient-to-r from-blue-700 to-blue-800',
+        text: 'text-white',
+        border: 'border-blue-300',
+        hoverBorder: 'border-blue-400'
+      }
+    },
+    {
       key: 'asistencia',
       label: 'Registro de asistencia',
       shortLabel: 'Asistencia',
@@ -71,23 +89,6 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
       icon: (
         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-        </svg>
-      ),
-      colors: {
-        bg: 'bg-gradient-to-r from-blue-600 to-blue-700',
-        bgHover: 'bg-gradient-to-r from-blue-700 to-blue-800',
-        text: 'text-white',
-        border: 'border-blue-300',
-        hoverBorder: 'border-blue-400'
-      }
-    },
-    {
-      key: 'vacaciones',
-      label: 'Vacaciones',
-      shortLabel: 'Vacaciones',
-      icon: (
-        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       ),
       colors: {
@@ -204,33 +205,11 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
       case 'resumen':
         return <Resumen trabajador={trabajador} />;
 
+      case 'nombradas':
+        return <NombradasTab />;
+
       case 'asistencia':
         return <Asistencia />;
-
-      case 'vacaciones':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4">Vacaciones Disponibles</h3>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">15</div>
-                <p className="text-gray-600">días disponibles</p>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4">Próximo Período</h3>
-              <p className="text-gray-600 mb-2">11 de septiembre - 11 de octubre</p>
-              <div className="grid grid-cols-5 md:grid-cols-10 gap-1">
-                {Array.from({ length: 10 }, (_, i) => (
-                  <div key={i} className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs font-medium ${i < 5 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                    }`}>
-                    {i + 1 < 10 ? `0${i + 1}` : i + 1}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
 
       case 'permisos':
         return (
@@ -361,7 +340,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
           </div>
         </div>
 
-        {/* Pestañas con nuevos colores azules */}
+        {/* Pestañas */}
         <div className="mb-6">
           {/* Pestañas para desktop y tablet */}
           <div className="hidden sm:flex flex-wrap gap-2">
@@ -385,7 +364,7 @@ export function MiFicha({ isSidebarCollapsed = false }: MiFichaProps) {
             ))}
           </div>
 
-          {/* Pestañas para móvil - Dropdown mejorado */}
+          {/* Pestañas para móvil - Dropdown */}
           <div className="sm:hidden">
             <div className="relative">
               <button
